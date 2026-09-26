@@ -18,7 +18,6 @@ export const ADMIN_ENDPOINTS = {
   RESPONSES: '/admin/responses',
   QUESTIONNAIRES: '/admin/questionnaires',
   QUESTIONS: '/admin/questions',
-  DISEASE_TYPES: '/admin/disease-types',
   CRISIS_EVENTS: '/admin/crisis-events',
   RISK_DETECTIONS: '/admin/risk-detections',
   PAYMENTS: '/admin/payments',

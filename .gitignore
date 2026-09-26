@@ -2,8 +2,10 @@ node_modules/
 .next/
 out/
 dist/
+package-lock.json
 .env
 .env.local
 .env.*.local
 *.tsbuildinfo
 next-env.d.ts
+.claudeignore

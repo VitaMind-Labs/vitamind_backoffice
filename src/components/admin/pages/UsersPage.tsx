@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { Plus, Eye, Search } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/DataTable";
-import { useUsers } from "@/hooks/use-users";
 import { formatDate } from "@/lib/utils";
 import type { User } from "@/lib/types/models/user";
+import { useUsers } from "@/hooks/use-users";
 
 const statusLabels: Record<string, string> = {
   active: "Active", inactive: "Inactive", suspended: "Suspended",
@@ -27,8 +27,8 @@ export function UsersPage() {
       key: "status", label: "Status", sortable: true,
       render: (u) => (
         u.status === "active" ? <span className="text-gray-700">Active</span> :
-        u.status === "inactive" ? <span className="text-gray-400">Inactive</span> :
-        <span className="text-red-600">Suspended</span>
+          u.status === "inactive" ? <span className="text-gray-400">Inactive</span> :
+            <span className="text-red-600">Suspended</span>
       ),
     },
     {
@@ -36,8 +36,8 @@ export function UsersPage() {
       render: (u) => (
         <span className={
           u.risk_level === "critical" ? "font-bold text-red-600" :
-          u.risk_level === "high" ? "font-semibold text-black" :
-          u.risk_level === "moderate" ? "text-gray-700" : "text-gray-500"
+            u.risk_level === "high" ? "font-semibold text-black" :
+              u.risk_level === "moderate" ? "text-gray-700" : "text-gray-500"
         }>{u.risk_level ?? "—"}</span>
       ),
     },
