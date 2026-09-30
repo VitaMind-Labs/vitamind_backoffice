@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
 import {
-  LayoutDashboard, Users, ClipboardList, FileText, ShieldAlert, Bell, LogOut, ChevronLeft, Sparkles,
+  LayoutDashboard, Users, ClipboardList, FileText, ShieldAlert, Bell, LogOut, ChevronLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRiskDetections } from "@/hooks/use-risks";
@@ -18,11 +19,18 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
-const menuItems = [
+interface MenuItem {
+  label: string;
+  path: string;
+  icon: keyof typeof iconMap;
+  href?: string;
+}
+
+const menuItems: MenuItem[] = [
   { label: "Dashboard", path: "", icon: "LayoutDashboard" as const },
   { label: "Users", path: "/users", icon: "Users" as const },
   { label: "Risk Detection", path: "/risks", icon: "ShieldAlert" as const },
-  { label: "Notifications", path: "/notifications", icon: "Bell" as const },
+  { label: "Notifications", path: "/notifications", icon: "Bell" as const, href: "/admin/notifications" },
 ];
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
@@ -45,9 +53,17 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       className="fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-200"
     >
       <div className="flex h-14 items-center justify-between border-b border-gray-200 px-4">
-        <Link href={`/${sessionId}`} className="flex items-center gap-2 overflow-hidden">
-          <Sparkles className="h-5 w-5 shrink-0 text-black" />
-          {!collapsed && <span className="text-sm font-bold text-black">VitaMind</span>}
+        <Link href={`/${sessionId}`} className="flex items-center justify-center gap-2 overflow-hidden" aria-label="VitaMind">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent">
+            <Image
+              src="/logo.svg"
+              alt="VitaMind"
+              width={44}
+              height={44}
+              className="h-11 w-11 shrink-0 bg-transparent object-contain"
+              priority
+            />
+          </div>
         </Link>
         <button
           onClick={onToggle}
@@ -60,7 +76,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <nav className="flex-1 overflow-y-auto p-2">
         {menuItems.map((item) => {
           const Icon = iconMap[item.icon] || LayoutDashboard;
-          const href = item.path ? `/${sessionId}?page=${item.path.replace("/", "")}` : `/${sessionId}`;
+          const href = item.href ?? (item.path ? `/${sessionId}?page=${item.path.replace("/", "")}` : `/${sessionId}`);
           const pageKey = item.path.replace("/", "") || "dashboard";
           const isActive = currentPage === pageKey;
 

@@ -1,11 +1,7 @@
-import type { Metadata } from "next";
-import { AuthScreen } from "@/components/auth/AuthScreen";
+import { redirect } from "next/navigation";
+import { SIGNIN_PATH } from "@/lib/auth/constants";
 
-export const metadata: Metadata = {
-  title: "Sign In | VitaMind",
-  description: "Secure sign in experience for VitaMind users.",
-};
-
-export default function SignInPage() {
-  return <AuthScreen />;
+/** Legacy URL: admin sign-in now lives at /auth/admin/signin. */
+export default function LegacySignInPage() {
+  redirect(SIGNIN_PATH);
 }

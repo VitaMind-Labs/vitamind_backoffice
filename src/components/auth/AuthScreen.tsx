@@ -114,13 +114,13 @@ export function AuthScreen() {
         <div className="flex h-full flex-col justify-center bg-gradient-to-br from-[#518591]/5 to-[#e3b01c]/5 px-16">
           <div className="mx-auto max-w-md">
             <div className="mb-8 flex justify-center">
-              <div className="flex h-30 w-30 items-center justify-center rounded-xl bg-white/50 border border-[#518591]/20">
+              <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-white/50 border border-[#518591]/20">
                 <Image
-                  src="/logo.png"
-                  alt="VitaMind"
-                  width={20}
-                  height={20}
-                  className="h-20 w-20 object-contain "
+                  src="/logo.svg"
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="h-24 w-24 object-contain"
                   priority
                 />
               </div>
@@ -129,7 +129,7 @@ export function AuthScreen() {
               <p className="text-xl leading-relaxed text-[#222222]">
                 &ldquo;Streamline your mental wellness management with our comprehensive admin platform.&rdquo;
               </p>
-              <p className="mt-4 text-sm font-medium text-[#518591]">VitaMind Admin</p>
+              <p className="mt-4 text-sm font-medium text-[#518591]">Admin</p>
             </blockquote>
           </div>
         </div>
