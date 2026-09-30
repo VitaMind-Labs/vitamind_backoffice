@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { authApi, AuthError } from "@/lib/api/auth";
 import { SESSION_EXPIRED_EVENT, SIGNIN_PATH } from "@/lib/auth/constants";
 import { can as canRole, type Permission } from "@/lib/permissions";
@@ -38,18 +38,18 @@ export function AdminSessionProvider({
   renderError: (message: string, retry: () => void) => ReactNode;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
   const [state, setState] = useState<State>({ status: "loading" });
 
   const redirectToSignIn = useCallback(
     (reason?: string) => {
       const params = new URLSearchParams();
-      if (pathname && pathname !== "/admin") params.set("next", pathname);
+      const currentPath = `${window.location.pathname}${window.location.search}`;
+      if (window.location.pathname !== "/admin") params.set("next", currentPath);
       if (reason) params.set("reason", reason);
       const qs = params.toString();
       router.replace(`${SIGNIN_PATH}${qs ? `?${qs}` : ""}`);
     },
-    [pathname, router],
+    [router],
   );
 
   const load = useCallback(async () => {

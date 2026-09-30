@@ -1,17 +1,33 @@
 import { Activity, Check, Lock, ScrollText, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Logo3D } from "./logo-3d";
 
-export function AuthLogo({ inverted }: { inverted?: boolean }) {
+export function AuthLogo({ inverted, withWordmark }: { inverted?: boolean; withWordmark?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="relative grid size-9 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-primary to-auth-panel-2 text-sm font-bold text-primary-foreground shadow-md ring-1 ring-inset ring-white/15">
-        VM
-        <span className="absolute -right-1 -top-1 size-3 rounded-full bg-brand-gold/90" aria-hidden />
+      <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-transparent">
+        <Image
+          src="/logo.svg"
+          alt="VitaMind"
+          width={44}
+          height={44}
+          className="h-11 w-11 bg-transparent object-contain"
+          priority
+        />
       </span>
-      <span className="leading-tight">
-        <span className={cn("block text-sm font-semibold", inverted ? "text-auth-panel-foreground" : "text-foreground")}>VitaMind</span>
-        <span className={cn("block text-xs", inverted ? "text-auth-panel-muted" : "text-muted-foreground")}>Operations console</span>
-      </span>
+      {withWordmark && (
+        <span className="leading-tight">
+          <span
+            className={`block text-[15px] font-semibold tracking-tight ${inverted ? "text-auth-panel-foreground" : "text-foreground"}`}
+          >
+            VitaMind
+          </span>
+          <span className={`block text-[11px] font-medium ${inverted ? "text-auth-panel-muted" : "text-muted-foreground"}`}>
+            Clinical platform
+          </span>
+        </span>
+      )}
     </div>
   );
 }
@@ -34,10 +50,14 @@ export function AuthBrandPanel() {
       <div className="pointer-events-none absolute -bottom-32 -left-20 size-[360px] rounded-full bg-brand-gold/10 blur-3xl" aria-hidden />
 
       <div className="relative">
-        <AuthLogo inverted />
+        <AuthLogo inverted withWordmark />
       </div>
 
-      <div className="relative max-w-md space-y-8">
+      <div className="relative flex flex-1 items-center justify-center py-6">
+        <Logo3D size={300} />
+      </div>
+
+      <div className="relative max-w-md space-y-6">
         <div className="space-y-3">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-auth-panel-muted backdrop-blur">
             <Activity className="size-3.5 text-brand-gold" aria-hidden />
@@ -68,7 +88,7 @@ export function AuthBrandPanel() {
       </div>
 
       <div className="relative flex items-center justify-between gap-4 text-xs text-auth-panel-muted">
-        <span>Restricted system · authorised VitaMind staff only</span>
+        <span>Restricted system · authorised staff only</span>
         <span className="flex gap-1.5">
           {["RGPD", "2FA", "Audit"].map((chip) => (
             <span key={chip} className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 font-medium">

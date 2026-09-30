@@ -83,3 +83,6 @@ export type LicenseAuthority = (typeof LICENSE_AUTHORITIES)[number];
 
 export const LICENSE_STATUSES = ["PENDING", "VERIFIED", "REJECTED", "EXPIRED"] as const;
 export type LicenseStatus = (typeof LICENSE_STATUSES)[number];
+
+export const ASSIGNMENT_STATUSES = ["PENDING", "ACTIVE", "ENDED"] as const;
+export type AssignmentStatus = (typeof ASSIGNMENT_STATUSES)[number];

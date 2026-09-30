@@ -13,7 +13,7 @@ import { RequirePermission } from "@/components/admin/shared/permission";
 import { StatCard, StatGrid } from "@/components/admin/shared/stat-card";
 import { ErrorState } from "@/components/admin/shared/states";
 import { useApiQuery } from "@/hooks/admin/use-api-query";
-import { analyticsApi } from "@/lib/api/sessions";
+import { analyticsApi } from "@/lib/api/analytics";
 import { formatNumber, formatPercent, parsePercent } from "@/lib/formatters";
 import { TRIGGER_TYPES } from "@/types/admin";
 

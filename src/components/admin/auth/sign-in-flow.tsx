@@ -13,10 +13,18 @@ import type { AdminPrincipal } from "@/types/admin";
 import { OtpField } from "./otp-field";
 import { TwoFactorSetup } from "./two-factor-setup";
 import { AuthBrandPanel, AuthLogo, StepIndicator } from "./auth-layout";
+import { Logo3D } from "./logo-3d";
 
 type Step = "credentials" | "verify" | "setup";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const RECOVERY_RE = /^[A-Z2-9]{4}-[A-Z2-9]{4}$/;
+
+/** Normalises a recovery code as XXXX-XXXX while typing. */
+function formatRecoveryCode(value: string): string {
+  const clean = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+  return clean.length > 4 ? `${clean.slice(0, 4)}-${clean.slice(4)}` : clean;
+}
 
 const REASON_MESSAGES: Record<string, { tone: "info" | "warning"; text: string }> = {
   expired: { tone: "warning", text: "Your session expired. Please sign in again." },
@@ -57,6 +65,8 @@ export function SignInFlow() {
   const [pending, setPending] = useState(false);
   const [code, setCode] = useState("");
   const [capsLock, setCapsLock] = useState(false);
+  const [useRecoveryCode, setUseRecoveryCode] = useState(false);
+  const [recoveryInput, setRecoveryInput] = useState("");
 
   const finish = (user: AdminPrincipal | null) => {
     router.replace(next ?? (user ? homePathFor(user.role) : "/admin"));
@@ -85,7 +95,9 @@ export function SignInFlow() {
   };
 
   const verify = async (token: string) => {
-    if (token.length !== 6 || pending) return;
+    const normalized = token.trim().toUpperCase();
+    const valid = /^\d{6}$/.test(normalized) || RECOVERY_RE.test(normalized);
+    if (!valid || pending) return;
     setPending(true);
     setError(null);
     try {
@@ -106,6 +118,8 @@ export function SignInFlow() {
   const backToCredentials = () => {
     setStep("credentials");
     setCode("");
+    setRecoveryInput("");
+    setUseRecoveryCode(false);
     setError(null);
   };
 
@@ -129,11 +143,17 @@ export function SignInFlow() {
 
         <div className="relative flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-[400px] space-y-6 rounded-2xl border bg-card/85 p-6 shadow-lg backdrop-blur-md sm:p-8">
+            <div className="-mt-2 lg:hidden">
+              <Logo3D size={112} />
+            </div>
             <StepIndicator current={stepIndex} steps={["Credentials", step === "setup" ? "Enrol 2FA" : "Verification"]} />
 
             {step === "credentials" && (
               <>
-                <div className="space-y-1.5">
+                <div className="space-y-2.5">
+                  <p className="inline-flex items-center gap-1.5 rounded-full border bg-muted/60 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                    Back office · Restricted access
+                  </p>
                   <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
                   <p className="text-sm text-muted-foreground">Sign in with your VitaMind admin account.</p>
                 </div>
@@ -218,13 +238,49 @@ export function SignInFlow() {
                     <Smartphone className="size-5" aria-hidden />
                   </span>
                   <h1 className="pt-3 text-2xl font-semibold tracking-tight">Two-factor verification</h1>
-                  <p className="text-sm text-muted-foreground">Enter the 6-digit code from your authenticator app.</p>
+                  <p className="text-sm text-muted-foreground">
+                    {useRecoveryCode
+                      ? "Enter one of the recovery codes saved at setup. Each code works once."
+                      : "Enter the 6-digit code from your authenticator app."}
+                  </p>
                 </div>
                 {error && <Alert tone="error">{error}</Alert>}
-                <OtpField value={code} onChange={setCode} onComplete={verify} disabled={pending} />
+                {useRecoveryCode ? (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="recovery-code">Recovery code</Label>
+                    <Input
+                      id="recovery-code"
+                      autoFocus
+                      autoComplete="one-time-code"
+                      placeholder="XXXX-XXXX"
+                      value={recoveryInput}
+                      onChange={(e) => setRecoveryInput(formatRecoveryCode(e.target.value))}
+                      disabled={pending}
+                      className="h-11 text-center font-mono text-[15px] tracking-[0.2em]"
+                    />
+                  </div>
+                ) : (
+                  <OtpField value={code} onChange={setCode} onComplete={verify} disabled={pending} />
+                )}
                 <div className="space-y-2">
-                  <Button className="h-11 w-full" onClick={() => verify(code)} loading={pending} disabled={code.length !== 6}>
+                  <Button
+                    className="h-11 w-full"
+                    onClick={() => verify(useRecoveryCode ? recoveryInput : code)}
+                    loading={pending}
+                    disabled={useRecoveryCode ? !RECOVERY_RE.test(recoveryInput) : code.length !== 6}
+                  >
                     Verify and continue
+                  </Button>
+                  <Button
+                    variant="link"
+                    className="h-auto w-full py-1 text-[13px]"
+                    onClick={() => {
+                      setUseRecoveryCode((v) => !v);
+                      setError(null);
+                    }}
+                    disabled={pending}
+                  >
+                    {useRecoveryCode ? "Use the authenticator code instead" : "Lost your authenticator? Use a recovery code"}
                   </Button>
                   <Button variant="ghost" className="w-full" onClick={backToCredentials} disabled={pending}>
                     <ArrowLeft /> Use a different account

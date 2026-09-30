@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Activity,
   ArrowLeft,
   ArrowLeftRight,
   CreditCard,
@@ -29,7 +28,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartCard } from "@/components/admin/charts/chart-card";
-import { MetricLineChart } from "@/components/admin/charts/metric-line-chart";
 import { RiskTrendChart } from "@/components/admin/charts/risk-trend-chart";
 import { ConfirmDialog } from "@/components/admin/shared/confirm-dialog";
 import { DataTable, Pagination } from "@/components/admin/shared/data-table";
@@ -38,7 +36,6 @@ import { ErrorState, PageSkeleton } from "@/components/admin/shared/states";
 import { MetricCard } from "@/components/admin/shared/stat-card";
 import { RiskBadge, StatusBadge } from "@/components/admin/shared/status-badge";
 import { PaymentDrawer, paymentColumns } from "@/components/admin/payments/payment-parts";
-import { SessionDrawer, sessionColumns } from "@/components/admin/sessions/session-parts";
 import { useAdminSession } from "@/components/admin/providers/admin-session-provider";
 import { useApiMutation } from "@/hooks/admin/use-api-mutation";
 import { useApiQuery } from "@/hooks/admin/use-api-query";
@@ -94,49 +91,6 @@ function OverviewTab({ user }: { user: AdminUserDetail }) {
       <PrivacyNote>
         Mira transcripts, summaries, reports, journal content and clinician notes are never available in the back office.
       </PrivacyNote>
-    </div>
-  );
-}
-
-function SessionsTab({ userId }: { userId: string }) {
-  const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<string | null>(null);
-  const q = useApiQuery(["users", "sessions", userId, page], () => usersApi.sessions(userId, { page, limit: 20 }), { keepPrevious: true });
-  const points = [...(q.data?.data ?? [])]
-    .reverse()
-    .map((s) => ({ at: s.startTime, value: s.wpmAvg }));
-
-  return (
-    <div className="space-y-5">
-      <ChartCard
-        title="Typing speed per session"
-        description="Average words per minute, sessions on this page"
-        isLoading={q.isLoading}
-        error={q.error}
-        onRetry={q.refetch}
-        isEmpty={points.filter((p) => p.value !== null).length < 2}
-        emptyLabel="Not enough sessions to show a trend"
-        height={200}
-      >
-        <MetricLineChart points={points} label="WPM" digits={1} />
-      </ChartCard>
-      <Card className="overflow-hidden">
-        <DataTable
-          columns={sessionColumns({ withPatient: false })}
-          rows={q.data?.data}
-          rowKey={(s) => s.id}
-          isLoading={q.isLoading}
-          isFetching={q.isFetching}
-          stale={q.isPlaceholder}
-          error={q.error}
-          onRetry={q.refetch}
-          onRowClick={(s) => setSelected(s.id)}
-          activeRowKey={selected}
-          emptyTitle="No telemetry sessions"
-        />
-        {q.data && <Pagination page={q.data.page} totalPages={q.data.totalPages} total={q.data.total} limit={q.data.limit} onPageChange={setPage} isFetching={q.isFetching} />}
-      </Card>
-      <SessionDrawer sessionId={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }
@@ -373,11 +327,6 @@ export function UserDetail({ userId }: { userId: string }) {
           <TabsTrigger value="overview">
             <UserRound /> Overview
           </TabsTrigger>
-          {can("users.sessions") && (
-            <TabsTrigger value="sessions">
-              <Activity /> Sessions
-            </TabsTrigger>
-          )}
           {can("users.payments") && (
             <TabsTrigger value="payments">
               <CreditCard /> Payments
@@ -392,11 +341,6 @@ export function UserDetail({ userId }: { userId: string }) {
         <TabsContent value="overview">
           <OverviewTab user={user} />
         </TabsContent>
-        {can("users.sessions") && (
-          <TabsContent value="sessions">
-            <SessionsTab userId={user.id} />
-          </TabsContent>
-        )}
         {can("users.payments") && (
           <TabsContent value="payments">
             <PaymentsTab userId={user.id} />

@@ -59,12 +59,18 @@ function authFailure(res: Response, payload: unknown, fallback: string) {
 }
 
 /** Opens the session from a backend login-like response and returns the principal. */
-async function completeSession(res: Response, payload: unknown) {
+async function completeSession(res: Response, payload: unknown, extra?: (data: Record<string, unknown>) => Record<string, unknown>) {
   const session = sessionFromResponse(payload, res);
   if (!session) return json({ message: "Unexpected response from the authentication server." }, 502);
   await persistSession(session);
-  return json({ status: "authenticated", user: session.user });
+  const body: Record<string, unknown> = { status: "authenticated", user: session.user };
+  const data = unwrap<Record<string, unknown>>(payload);
+  if (extra && data && typeof data === "object") Object.assign(body, extra(data));
+  return json(body);
 }
+
+/** 6-digit TOTP or XXXX-XXXX single-use recovery code. */
+const OTP_RE = /^(\d{6}|[A-Z2-9]{4}-[A-Z2-9]{4})$/i;
 
 async function login(req: NextRequest) {
   const { email, password } = await readBody<{ email: string; password: string }>(req);
@@ -98,11 +104,11 @@ async function verify2fa(req: NextRequest) {
   if (!challenge || challenge.kind !== "2fa") {
     return json({ message: "Your verification step expired. Please sign in again." }, 401);
   }
-  if (!token || !/^\d{6}$/.test(token)) return json({ message: "Enter the 6-digit code from your authenticator app." }, 400);
+  if (!token || !OTP_RE.test(token.trim())) return json({ message: "Enter the 6-digit code from your authenticator app." }, 400);
 
   const res = await backend("/auth/admin/login/2fa", {
     method: "POST",
-    body: JSON.stringify({ temp_token: challenge.token, token }),
+    body: JSON.stringify({ temp_token: challenge.token, token: token.trim().toUpperCase() }),
   });
   const payload = await readJson(res);
   if (!res.ok) return authFailure(res, payload, "Invalid verification code.");
@@ -128,18 +134,21 @@ async function enable2fa() {
 
 async function confirm2fa(req: NextRequest) {
   const { token } = await readBody<{ token: string }>(req);
-  if (!token || !/^\d{6}$/.test(token)) return json({ message: "Enter the 6-digit code from your authenticator app." }, 400);
+  if (!token || !/^\d{6}$/.test(token.trim())) return json({ message: "Enter the 6-digit code from your authenticator app." }, 400);
   const res = await withEnrollmentToken((bearer) =>
     backend("/auth/admin/2fa/confirm", {
       method: "POST",
       headers: { Authorization: `Bearer ${bearer}` },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ token: token.trim() }),
     }),
   );
   if (!res) return json({ message: "Your session expired. Please sign in again." }, 401);
   const payload = await readJson(res);
   if (!res.ok) return authFailure(res, payload, "Invalid verification code.");
-  return completeSession(res, payload);
+  // Recovery codes are issued exactly once: forward them so the setup wizard can display them.
+  return completeSession(res, payload, (data) =>
+    Array.isArray(data.backup_codes) ? { backup_codes: data.backup_codes } : {},
+  );
 }
 
 async function refresh() {

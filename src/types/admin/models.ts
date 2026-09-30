@@ -20,6 +20,7 @@ import type {
   NotificationType,
   PaymentStatus,
   PsychologistStatus,
+  AssignmentStatus,
   RiskLevel,
   SubscriptionStatus,
   SubscriptionTier,
@@ -165,6 +166,10 @@ export interface ModelDrift {
   previousPeriodCrisis: number;
   driftDetected: boolean;
   alert: string | null;
+  byAgent: {
+    mira: { sessions7d: number; crisis7d: number };
+    lumina: { interactions7d: number; crisis7d: number };
+  };
 }
 
 export interface FalsePositives {
@@ -461,4 +466,40 @@ export interface LicenseVerification {
   status: LicenseStatus;
   verifiedAt: string | null;
   expiresAt: string | null;
+}
+
+/* ------------------------------------------------------------ Assignments */
+
+export interface PsychologistDirectoryEntry {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  clinicalRole: ClinicianRole;
+  status: PsychologistStatus;
+  specialties: string[];
+  licenseNumber: string | null;
+  verifiedAt: string | null;
+  createdAt: string;
+  clinic: { id: string; name: string } | null;
+  activeCaseload: number;
+}
+
+export interface PatientAssignment {
+  id: string;
+  status: AssignmentStatus;
+  isPrimary: boolean;
+  assignedAt: string;
+  consentedAt: string | null;
+  endedAt: string | null;
+  endReason: string | null;
+  user: { id: string; patientNumber: number; nickname: string };
+  psychologist: { id: string; firstName: string; lastName: string; clinicalRole: ClinicianRole; status: PsychologistStatus };
+  assignedBy: { id: string; email: string } | null;
+}
+
+export interface AssignmentInput {
+  userId: string;
+  psychologistId: string;
+  isPrimary?: boolean;
 }

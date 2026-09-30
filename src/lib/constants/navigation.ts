@@ -1,5 +1,4 @@
 import {
-  Activity,
   Bell,
   BellRing,
   Building2,
@@ -8,13 +7,13 @@ import {
   FileBadge,
   Gauge,
   LayoutDashboard,
-  LineChart,
   Package,
   ShieldAlert,
   Siren,
   Stethoscope,
   TrendingUp,
   Users,
+  UserRoundCheck,
   CircleSlash,
   type LucideIcon,
 } from "lucide-react";
@@ -44,7 +43,6 @@ export const NAVIGATION: NavGroup[] = [
     label: "Patients",
     items: [
       { label: "Users", href: "/admin/users", icon: Users, permissions: ["users.list"] },
-      { label: "Sessions", href: "/admin/sessions", icon: Activity, permissions: ["sessions.view"] },
       { label: "Diagnostics", href: "/admin/diagnostics", icon: Stethoscope, permissions: ["diagnostics.view"] },
       { label: "Risk History", href: "/admin/risk-history", icon: TrendingUp, permissions: ["users.riskHistory"] },
     ],
@@ -59,7 +57,6 @@ export const NAVIGATION: NavGroup[] = [
   {
     label: "Analytics",
     items: [
-      { label: "Behavioural Analytics", href: "/admin/behavioural-analytics", icon: LineChart, permissions: ["analytics.view"] },
       { label: "Model Drift", href: "/admin/model-drift", icon: Gauge, permissions: ["analytics.view"] },
       { label: "False Positives", href: "/admin/false-positives", icon: CircleSlash, permissions: ["analytics.view"] },
     ],
@@ -76,6 +73,7 @@ export const NAVIGATION: NavGroup[] = [
     items: [
       { label: "Notifications", href: "/admin/notifications", icon: BellRing, permissions: ["notifications.view"] },
       { label: "Clinics", href: "/admin/clinics", icon: Building2, permissions: ["clinics.view"] },
+      { label: "Assignments", href: "/admin/assignments", icon: UserRoundCheck, permissions: ["assignments.view"] },
       { label: "Licenses", href: "/admin/licenses", icon: FileBadge, permissions: ["licenses.manage"] },
     ],
   },

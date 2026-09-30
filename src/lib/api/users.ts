@@ -11,7 +11,6 @@ import type {
   RiskLevel,
   SortOrder,
   SubscriptionTier,
-  UserSession,
   UserStatus,
 } from "@/types/admin";
 
@@ -46,7 +45,6 @@ export const usersApi = {
     api.patch<{ id: string; status: UserStatus }>(`/users/${id}/status`, input),
   updateSubscription: (id: string, input: { tier: SubscriptionTier; reason: string }) =>
     api.patch<{ id: string; subscriptionPlanId: string; tier: SubscriptionTier }>(`/users/${id}/subscription`, input),
-  sessions: (id: string, query: PageQuery) => api.get<Paginated<UserSession>>(`/users/${id}/sessions`, { ...query }),
   payments: (id: string, query: PageQuery) => api.get<Paginated<Payment>>(`/users/${id}/payments`, { ...query }),
   riskHistory: (id: string) => api.get<RiskHistoryPoint[]>(`/users/${id}/risk-history`),
 };

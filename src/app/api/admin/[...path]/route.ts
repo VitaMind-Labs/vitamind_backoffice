@@ -14,6 +14,10 @@ const FORWARDED_RESPONSE_HEADERS = ["content-type", "content-disposition", "cont
 
 async function proxy(req: NextRequest, { params }: Params) {
   const { path } = await params;
+  // Role isolation: never let a crafted segment ("..", "%2e%2e") climb out of /api/v1/admin.
+  if (path.some((segment) => segment === "" || segment === "." || segment === ".." || /[\\/]/.test(segment))) {
+    return NextResponse.json({ success: false, statusCode: 400, message: "Invalid admin API path." }, { status: 400 });
+  }
   const target = `${API_BASE}/api/v1/admin/${path.map(encodeURIComponent).join("/")}${req.nextUrl.search}`;
   const hasBody = !["GET", "HEAD"].includes(req.method);
   const body = hasBody ? await req.text() : undefined;

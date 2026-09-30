@@ -1,12 +1,6 @@
-"use client";
+import { notFound } from "next/navigation";
 
-import { RequirePermission } from "@/components/admin/shared/permission";
-import { SessionsView } from "@/components/admin/sessions/sessions-view";
-
-export default function SessionsPage() {
-  return (
-    <RequirePermission permission="sessions.view">
-      <SessionsView />
-    </RequirePermission>
-  );
+/** Retired: the backend exposes no matching admin endpoint. Kept as a 404 until the unused files are removed. */
+export default function RetiredPage() {
+  notFound();
 }

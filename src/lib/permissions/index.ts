@@ -19,13 +19,12 @@ const PERMISSIONS = {
   "users.delete": ["ADMIN"],
   "users.status": ["ADMIN", "SUPPORT"],
   "users.subscription": ["FINANCE"],
-  "users.sessions": ["ADMIN"],
   "users.payments": ["ADMIN", "FINANCE"],
   "users.riskHistory": ["ADMIN"],
 
   // Clinical operations & telemetry
-  "sessions.view": ["ADMIN"],
-  "sessions.manage": ["ADMIN"],
+  "assignments.view": ["ADMIN"],
+  "assignments.manage": ["ADMIN"],
   "crisis.view": ["ADMIN"],
   "crisis.manage": ["ADMIN"],
   "alerts.view": ["ADMIN"],

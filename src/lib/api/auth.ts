@@ -3,7 +3,7 @@ import type { AdminPrincipal, AdminProfile, TwoFactorEnrollment } from "@/types/
 /** Client for the same-origin auth BFF (/api/auth/*). Tokens never reach the browser. */
 
 export type LoginResult =
-  | { status: "authenticated"; user: AdminPrincipal }
+  | { status: "authenticated"; user: AdminPrincipal; backup_codes?: string[] }
   | { status: "requires_2fa" }
   | { status: "requires_2fa_setup" };
 
