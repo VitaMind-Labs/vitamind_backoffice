@@ -146,11 +146,11 @@ export function TwoFactorSetup({
             ) : (
               <Skeleton className="size-36 shrink-0" />
             )}
-            <div className="min-w-0 space-y-1.5 text-center sm:text-left">
+            <div className="min-w-0 w-full flex-1 space-y-1.5 text-center sm:text-left">
               <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground sm:justify-start">
                 <KeyRound className="size-3.5" /> Or enter this key manually
               </p>
-              {enrollment ? <CopyableId value={enrollment.secret} /> : <Skeleton className="h-4 w-40" />}
+              {enrollment ? <div className="break-all [&_span]:whitespace-normal [&_span]:break-all [&_span]:[overflow:visible]"><CopyableId value={enrollment.secret} /></div> : <Skeleton className="h-4 w-40" />}
             </div>
           </div>
           <div className="flex gap-2">
@@ -204,7 +204,7 @@ export function TwoFactorSetup({
               we store hashes, never the codes themselves.
             </p>
           </div>
-          <ol className="grid grid-cols-2 gap-2" aria-label="Recovery codes">
+          <ol className="grid grid-cols-2 gap-2 sm:grid-cols-2" aria-label="Recovery codes">
             {(backupCodes ?? []).map((c) => (
               <li
                 key={c}

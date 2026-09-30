@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, ArrowLeft, ArrowRight, Eye, EyeOff, Info, KeyRound, Lock, ScrollText, ShieldCheck, Smartphone, TriangleAlert } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Eye, EyeOff, Info, Lock, Smartphone, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,8 +12,7 @@ import { homePathFor } from "@/lib/permissions";
 import type { AdminPrincipal } from "@/types/admin";
 import { OtpField } from "./otp-field";
 import { TwoFactorSetup } from "./two-factor-setup";
-import { AuthBrandPanel, AuthLogo, StepIndicator } from "./auth-layout";
-import { Logo3D } from "./logo-3d";
+import { AuthLogo, StepIndicator } from "./auth-layout";
 
 type Step = "credentials" | "verify" | "setup";
 
@@ -126,42 +125,33 @@ export function SignInFlow() {
   const stepIndex = step === "credentials" ? 0 : 1;
 
   return (
-    <div className="grid min-h-dvh bg-background lg:grid-cols-[minmax(0,6fr)_minmax(0,7fr)]">
-      <AuthBrandPanel />
+    <div className="relative flex min-h-dvh flex-col bg-background">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,var(--glow),transparent_70%)]" aria-hidden />
+      <div className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6">
+        <ThemeToggle />
+      </div>
 
-      <main className="relative flex flex-col px-4 py-6 sm:px-8">
-        <div
-          className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
-          aria-hidden
-        />
-        <div className="relative flex items-center justify-between">
-          <div className="lg:invisible">
+      <main className="relative flex flex-1 items-center justify-center px-4 py-12">
+        <div className="w-full max-w-[380px] space-y-8">
+          <div className="flex flex-col items-center gap-3 text-center">
             <AuthLogo />
+            <span className="text-sm font-semibold tracking-tight text-foreground">VitaMind Back office</span>
           </div>
-          <ThemeToggle />
-        </div>
 
-        <div className="relative flex flex-1 items-center justify-center py-10">
-          <div className="w-full max-w-[400px] space-y-6 rounded-2xl border bg-card/85 p-6 shadow-lg backdrop-blur-md sm:p-8">
-            <div className="-mt-2 lg:hidden">
-              <Logo3D size={112} />
-            </div>
-            <StepIndicator current={stepIndex} steps={["Credentials", step === "setup" ? "Enrol 2FA" : "Verification"]} />
+          <div className="space-y-6 rounded-2xl border bg-card p-6 shadow-sm sm:p-8">
+            {step !== "credentials" && <StepIndicator current={stepIndex} steps={["Credentials", step === "setup" ? "Enrol 2FA" : "Verification"]} />}
 
             {step === "credentials" && (
               <>
-                <div className="space-y-2.5">
-                  <p className="inline-flex items-center gap-1.5 rounded-full border bg-muted/60 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                    Back office · Restricted access
-                  </p>
-                  <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
-                  <p className="text-sm text-muted-foreground">Sign in with your VitaMind admin account.</p>
+                <div className="space-y-1.5">
+                  <h1 className="text-xl font-semibold tracking-tight">Sign in</h1>
+                  <p className="text-sm text-muted-foreground">Use your VitaMind admin account.</p>
                 </div>
                 {reason && !error && <Alert tone={reason.tone}>{reason.text}</Alert>}
                 {error && <Alert tone="error">{error}</Alert>}
                 <form onSubmit={submitCredentials} className="space-y-4" noValidate>
                   <div className="space-y-1.5">
-                    <Label htmlFor="email">Work email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -224,10 +214,6 @@ export function SignInFlow() {
                     {!pending && <ArrowRight className="transition-transform group-hover:translate-x-0.5" />}
                   </Button>
                 </form>
-                <p className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2.5 text-xs text-muted-foreground">
-                  <KeyRound className="mt-px size-3.5 shrink-0" aria-hidden />
-                  Admin accounts are provisioned by a super admin. Contact them if you can’t sign in.
-                </p>
               </>
             )}
 
@@ -301,19 +287,11 @@ export function SignInFlow() {
               </>
             )}
           </div>
-        </div>
 
-        <footer className="relative flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-subtle-foreground">
-          <span className="flex items-center gap-1.5">
-            <Lock className="size-3" aria-hidden /> Encrypted session · httpOnly cookie
-          </span>
-          <span className="flex items-center gap-1.5">
-            <ScrollText className="size-3" aria-hidden /> Every sign-in is audited
-          </span>
-          <span className="flex items-center gap-1.5">
-            <ShieldCheck className="size-3" aria-hidden /> 2FA enforced
-          </span>
-        </footer>
+          <p className="flex items-center justify-center gap-1.5 text-xs text-subtle-foreground">
+            <Lock className="size-3" aria-hidden /> Secure, audited access
+          </p>
+        </div>
       </main>
     </div>
   );

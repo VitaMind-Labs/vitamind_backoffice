@@ -104,13 +104,13 @@ export function AuthBrandPanel() {
 /** Two-step progress for credentials → second factor. */
 export function StepIndicator({ steps, current }: { steps: string[]; current: number }) {
   return (
-    <ol className="flex items-center gap-2 text-xs" aria-label={`Step ${current + 1} of ${steps.length}`}>
+    <ol className="flex w-full items-center gap-2 text-xs" aria-label={`Step ${current + 1} of ${steps.length}`}>
       {steps.map((label, i) => {
         const done = i < current;
         const active = i === current;
         return (
-          <li key={label} className="flex items-center gap-2">
-            {i > 0 && <span className={cn("h-px w-6", done || active ? "bg-primary" : "bg-border")} aria-hidden />}
+          <li key={label} className={cn("flex items-center gap-2", i > 0 && "flex-1 min-w-0")}>
+            {i > 0 && <span className={cn("h-px min-w-3 flex-1", done || active ? "bg-primary" : "bg-border")} aria-hidden />}
             <span
               className={cn(
                 "grid size-5 place-items-center rounded-full text-[10px] font-semibold",
@@ -121,7 +121,7 @@ export function StepIndicator({ steps, current }: { steps: string[]; current: nu
             >
               {done ? <Check className="size-3" strokeWidth={3} /> : i + 1}
             </span>
-            <span className={cn(active ? "font-medium text-foreground" : "text-muted-foreground")}>{label}</span>
+            <span className={cn("whitespace-nowrap", active ? "font-medium text-foreground" : "sr-only")}>{label}</span>
           </li>
         );
       })}
