@@ -168,7 +168,7 @@ function UserMenu() {
       </DropdownMenu>
 
       <Dialog open={twoFactorOpen} onOpenChange={setTwoFactorOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-w-md gap-4 overflow-x-hidden p-5 sm:p-6">
           <DialogHeader>
             <DialogTitle>Enable two-factor authentication</DialogTitle>
             <DialogDescription>Protect this admin account with a time-based code from an authenticator app.</DialogDescription>
