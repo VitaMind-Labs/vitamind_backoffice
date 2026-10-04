@@ -5,6 +5,9 @@ import type {
   ClinicInput,
   LicenseVerification,
   LicenseVerifyInput,
+  BroadcastInput,
+  NotificationAudience,
+  NotificationSummary,
   NotificationType,
   PageQuery,
   Paginated,
@@ -16,10 +19,15 @@ export interface NotificationFilters extends PageQuery {
   type?: NotificationType;
   read?: boolean;
   from?: string;
+  audience?: NotificationAudience;
+  mine?: boolean;
 }
 
 export const notificationsApi = {
   list: (filters: NotificationFilters) => api.get<Paginated<AdminNotification>>("/notifications", { ...filters }),
+  summary: () => api.get<NotificationSummary>("/notifications/summary"),
+  markAllMineRead: () => api.patch<{ updated: number }>("/notifications/read-all"),
+  broadcast: (input: BroadcastInput) => api.post<{ audience: string; sent: number }>("/notifications/broadcast", input),
   markRead: (id: string) => api.patch<AdminNotification>(`/notifications/${id}/read`),
   remove: (id: string) => api.delete<{ id: string; deleted: boolean }>(`/notifications/${id}`),
 };

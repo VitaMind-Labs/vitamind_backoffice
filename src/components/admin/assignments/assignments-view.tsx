@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import { Crown, MoreHorizontal, Plus, Search, UserRoundX } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/components/admin/shared/confirm-dialog";
 import { DataTable, Pagination, type Column } from "@/components/admin/shared/data-table";
-import { FilterBar, SearchInput, SelectFilter, optionsFrom } from "@/components/admin/shared/filters";
+import { FilterBar, SelectFilter, optionsFrom } from "@/components/admin/shared/filters";
 import { Field, FormDialog } from "@/components/admin/shared/form-dialog";
 import { PageHeader } from "@/components/admin/shared/page-header";
 import { Can } from "@/components/admin/shared/permission";
@@ -19,11 +17,12 @@ import { StatusBadge } from "@/components/admin/shared/status-badge";
 import { useApiMutation } from "@/hooks/admin/use-api-mutation";
 import { useApiQuery } from "@/hooks/admin/use-api-query";
 import { useListState } from "@/hooks/admin/use-list-state";
-import { assignmentsApi, type AssignmentFilters, type DirectoryFilters } from "@/lib/api/assignments";
+import { assignmentsApi, type AssignmentFilters } from "@/lib/api/assignments";
 import { usersApi } from "@/lib/api/users";
-import { ASSIGNMENT_STATUS_META, CLINICIAN_ROLE_LABELS, PSYCHOLOGIST_STATUS_META } from "@/lib/constants/status";
-import { formatDate, formatNumber, patientRef } from "@/lib/formatters";
-import { ASSIGNMENT_STATUSES, PSYCHOLOGIST_STATUSES, type PatientAssignment, type PsychologistDirectoryEntry } from "@/types/admin";
+import { ASSIGNMENT_STAGE_META, CLINICIAN_ROLE_LABELS } from "@/lib/constants/status";
+import { formatDate, formatRelative, patientRef } from "@/lib/formatters";
+import { cn } from "@/lib/utils";
+import { ASSIGNMENT_STAGES, type PatientAssignment } from "@/types/admin";
 
 const REASON_MAX = 300;
 const fullName = (p: { firstName: string; lastName: string }) => `${p.firstName} ${p.lastName}`.trim() || "Unnamed clinician";
@@ -46,7 +45,7 @@ function AssignDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (op
     () => assignmentsApi.create({ userId: patient!.id, psychologistId, isPrimary: isPrimary || undefined }),
     {
       invalidate: ["assignments"],
-      successMessage: "Assignment created — awaiting the patient's consent",
+      successMessage: "Request sent to the clinician — the patient is asked once they accept",
       onSuccess: () => onOpenChange(false),
     },
   );
@@ -56,7 +55,7 @@ function AssignDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (op
       open={open}
       onOpenChange={onOpenChange}
       title="Assign a patient"
-      description="The assignment stays pending until the patient accepts it. The action is recorded in the audit log."
+      description="The clinician accepts or declines first; the patient is then asked for consent. Care starts only when both have said yes. Recorded in the audit log."
       submitLabel="Create assignment"
       isPending={mutation.isPending}
       canSubmit={!!patient && !!psychologistId}
@@ -118,10 +117,13 @@ function AssignDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (op
   );
 }
 
-function AssignmentsTab() {
-  const list = useListState<AssignmentFilters>({ status: undefined }, 20, { id: "assignments", urlKeys: ["status"] });
+function AssignmentsTab({ focus }: { focus?: string }) {
+  const list = useListState<AssignmentFilters>({ stage: undefined, psychologistId: undefined }, 20, { id: "assignments", urlKeys: ["stage", "psychologistId"] });
   const [ending, setEnding] = useState<PatientAssignment | null>(null);
-  const q = useApiQuery(["assignments", "list", list.params], () => assignmentsApi.list(list.params), { keepPrevious: true });
+  // Deep link (e.g. from a notification): narrow the list to that one assignment until the admin clears it.
+  const [focusId, setFocusId] = useState(focus);
+  const params = focusId ? { ...list.params, id: focusId } : list.params;
+  const q = useApiQuery(["assignments", "list", params], () => assignmentsApi.list(params), { keepPrevious: true });
 
   const end = useApiMutation((v: { id: string; reason: string }) => assignmentsApi.end(v.id, v.reason), {
     invalidate: ["assignments"],
@@ -157,9 +159,24 @@ function AssignmentsTab() {
         </div>
       ),
     },
-    { id: "status", header: "Status", cell: (a) => <StatusBadge value={a.status} meta={ASSIGNMENT_STATUS_META} /> },
+    {
+      id: "stage",
+      header: "Stage",
+      cell: (a) => (
+        <div>
+          <StatusBadge value={a.stage} meta={ASSIGNMENT_STAGE_META} />
+          {a.stage === "AWAITING_CLINICIAN" && (
+            <p className={cn("mt-0.5 text-xs text-muted-foreground", Date.now() - new Date(a.assignedAt).getTime() > 48 * 3_600_000 && "font-medium text-warning")}>
+              asked {formatRelative(a.assignedAt)}
+            </p>
+          )}
+          {a.stage === "DECLINED" && a.declineReason && <p className="mt-0.5 max-w-56 truncate text-xs text-muted-foreground" title={a.declineReason}>{a.declineReason}</p>}
+        </div>
+      ),
+    },
     { id: "assigned", header: "Assigned", hideBelow: "md", cell: (a) => formatDate(a.assignedAt) },
-    { id: "consent", header: "Consent", hideBelow: "lg", cell: (a) => formatDate(a.consentedAt) },
+    { id: "accepted", header: "Clinician replied", hideBelow: "lg", cell: (a) => formatDate(a.psychologistAcceptedAt ?? a.psychologistDeclinedAt) },
+    { id: "consent", header: "Patient consent", hideBelow: "xl", cell: (a) => formatDate(a.consentedAt) },
     { id: "by", header: "Assigned by", hideBelow: "xl", cell: (a) => a.assignedBy?.email ?? "—" },
     {
       id: "actions",
@@ -197,12 +214,20 @@ function AssignmentsTab() {
 
   return (
     <Card className="overflow-hidden">
+      {focusId && (
+        <div className="flex items-center justify-between gap-3 border-b bg-accent/40 px-4 py-2 text-[13px]">
+          <span>Showing a single assignment.</span>
+          <Button type="button" variant="ghost" size="sm" onClick={() => setFocusId(undefined)}>
+            Show all assignments
+          </Button>
+        </div>
+      )}
       <FilterBar onReset={list.reset} canReset={list.isFiltered}>
         <SelectFilter
-          label="Status"
-          value={list.filters.status}
-          options={optionsFrom(ASSIGNMENT_STATUSES, ASSIGNMENT_STATUS_META)}
-          onChange={(v) => list.update({ status: v as AssignmentFilters["status"] })}
+          label="Stage"
+          value={list.filters.stage}
+          options={optionsFrom(ASSIGNMENT_STAGES, ASSIGNMENT_STAGE_META)}
+          onChange={(v) => list.update({ stage: v as AssignmentFilters["stage"] })}
         />
       </FilterBar>
       <DataTable
@@ -246,82 +271,7 @@ function AssignmentsTab() {
   );
 }
 
-function DirectoryTab() {
-  const list = useListState<DirectoryFilters>({ status: undefined, search: "" }, 20, { id: "psychologists", urlKeys: ["status", "search"] });
-  const q = useApiQuery(["assignments", "directory", list.params], () => assignmentsApi.directory(list.params), { keepPrevious: true });
-
-  const columns: Column<PsychologistDirectoryEntry>[] = [
-    {
-      id: "name",
-      header: "Clinician",
-      hideable: false,
-      cell: (p) => (
-        <div>
-          <p className="font-medium">{fullName(p)}</p>
-          <p className="text-xs text-muted-foreground">{p.email}</p>
-        </div>
-      ),
-    },
-    { id: "role", header: "Role", hideBelow: "md", cell: (p) => CLINICIAN_ROLE_LABELS[p.clinicalRole] ?? p.clinicalRole },
-    { id: "clinic", header: "Clinic", hideBelow: "lg", cell: (p) => p.clinic?.name ?? "—" },
-    {
-      id: "specialties",
-      header: "Specialties",
-      hideBelow: "xl",
-      cell: (p) =>
-        p.specialties.length ? (
-          <span className="flex flex-wrap gap-1">
-            {p.specialties.slice(0, 3).map((s) => (
-              <Badge key={s} tone="neutral">
-                {s}
-              </Badge>
-            ))}
-          </span>
-        ) : (
-          "—"
-        ),
-    },
-    { id: "status", header: "Status", cell: (p) => <StatusBadge value={p.status} meta={PSYCHOLOGIST_STATUS_META} /> },
-    { id: "caseload", header: "Active caseload", align: "right", cell: (p) => formatNumber(p.activeCaseload) },
-  ];
-
-  return (
-    <Card className="overflow-hidden">
-      <FilterBar onReset={list.reset} canReset={list.isFiltered}>
-        <SearchInput value={list.filters.search ?? ""} onChange={(search) => list.update({ search })} placeholder="Search name or email…" />
-        <SelectFilter
-          label="Status"
-          value={list.filters.status}
-          options={optionsFrom(PSYCHOLOGIST_STATUSES, PSYCHOLOGIST_STATUS_META)}
-          onChange={(v) => list.update({ status: v as DirectoryFilters["status"] })}
-        />
-      </FilterBar>
-      <DataTable
-        columns={columns}
-        rows={q.data?.data}
-        rowKey={(p) => p.id}
-        isLoading={q.isLoading}
-        isFetching={q.isFetching}
-        stale={q.isPlaceholder}
-        error={q.error}
-        onRetry={q.refetch}
-        emptyTitle="No clinicians found"
-      />
-      {q.data && (
-        <Pagination
-          page={q.data.page}
-          totalPages={q.data.totalPages}
-          total={q.data.total}
-          limit={q.data.limit}
-          onPageChange={list.setPage}
-          isFetching={q.isFetching}
-        />
-      )}
-    </Card>
-  );
-}
-
-export function AssignmentsView() {
+export function AssignmentsView({ focus }: { focus?: string }) {
   const [assigning, setAssigning] = useState(false);
   return (
     <div className="space-y-6">
@@ -336,18 +286,7 @@ export function AssignmentsView() {
           </Can>
         }
       />
-      <Tabs defaultValue="assignments">
-        <TabsList>
-          <TabsTrigger value="assignments">Assignments</TabsTrigger>
-          <TabsTrigger value="directory">Clinician directory</TabsTrigger>
-        </TabsList>
-        <TabsContent value="assignments">
-          <AssignmentsTab />
-        </TabsContent>
-        <TabsContent value="directory">
-          <DirectoryTab />
-        </TabsContent>
-      </Tabs>
+      <AssignmentsTab focus={focus} />
       {assigning && <AssignDialog open onOpenChange={setAssigning} />}
     </div>
   );

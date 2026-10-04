@@ -3,6 +3,7 @@ import type {
   AlertResolution,
   AlertStatus,
   AlertType,
+  AssignmentStage,
   AssignmentStatus,
   ClinicianRole,
   CrisisStatus,
@@ -155,6 +156,14 @@ export const DISEASE_LABELS: Record<string, string> = {
   BIPOLAR: "Bipolar",
   SCHIZOPHRENIA: "Schizophrenia",
   NONE: "Not determined",
+};
+
+export const ASSIGNMENT_STAGE_META: Record<AssignmentStage, StatusMeta> = {
+  AWAITING_CLINICIAN: { label: "Awaiting clinician", tone: "warning" },
+  AWAITING_PATIENT: { label: "Awaiting patient", tone: "info" },
+  ACTIVE: { label: "Active", tone: "success" },
+  DECLINED: { label: "Declined by clinician", tone: "danger" },
+  ENDED: { label: "Ended", tone: "neutral" },
 };
 
 export const ASSIGNMENT_STATUS_META: Record<AssignmentStatus, StatusMeta> = {

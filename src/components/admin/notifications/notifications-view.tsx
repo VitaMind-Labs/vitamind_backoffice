@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Check, CheckCheck, Inbox, Mail, MessageSquare, MoreHorizontal, Trash2, Users, Zap } from "lucide-react";
+import { Bell, Check, CheckCheck, Inbox, Mail, Megaphone, MessageSquare, MoreHorizontal, Trash2, Users, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Field, FormDialog } from "@/components/admin/shared/form-dialog";
 import { DataTable, Pagination, type Column } from "@/components/admin/shared/data-table";
 import { ConfirmDialog } from "@/components/admin/shared/confirm-dialog";
 import { DateRangeFilter, FilterBar, optionsFrom, SelectFilter } from "@/components/admin/shared/filters";
@@ -19,13 +23,14 @@ import { PageHeader } from "@/components/admin/shared/page-header";
 import { Can } from "@/components/admin/shared/permission";
 import { StatCard, StatGrid } from "@/components/admin/shared/stat-card";
 import { StatusBadge } from "@/components/admin/shared/status-badge";
+import { NotificationLink } from "@/components/admin/notifications/notification-link";
 import { useApiMutation } from "@/hooks/admin/use-api-mutation";
 import { useApiQuery } from "@/hooks/admin/use-api-query";
 import { useListState } from "@/hooks/admin/use-list-state";
 import { notificationsApi, type NotificationFilters } from "@/lib/api/operations";
 import { NOTIFICATION_PRIORITY_META } from "@/lib/constants/status";
-import { formatDateTime, formatNumber, formatPercent, formatRelative, humanize, patientRef } from "@/lib/formatters";
-import { NOTIFICATION_TYPES, type AdminNotification, type NotificationType } from "@/types/admin";
+import { formatDateTime, formatNumber, formatPercent, formatRelative, humanize } from "@/lib/formatters";
+import { NOTIFICATION_TYPES, type AdminNotification, type BroadcastAudience, type NotificationAudience, type NotificationType } from "@/types/admin";
 
 type Filters = Omit<NotificationFilters, "page" | "limit">;
 
@@ -38,11 +43,65 @@ const CHANNEL_ICONS: Record<string, typeof Mail> = {
   in_app: Inbox,
 };
 
+const AUDIENCE_LABEL: Record<NotificationAudience, string> = { ADMIN: "Admin team", PSYCHOLOGIST: "Clinician", PATIENT: "Patient" };
+
 function audience(notification: AdminNotification): string {
-  if (notification.user) return `Patient ${patientRef(notification.user.patientNumber)}`;
-  if (notification.psychologistId) return "Psychologist";
-  if (notification.adminId) return "Admin team";
-  return "System";
+  const who = AUDIENCE_LABEL[notification.audience];
+  return notification.recipient ? `${who} · ${notification.recipient}` : who;
+}
+
+const BROADCAST_AUDIENCES: Array<{ value: BroadcastAudience; label: string; hint: string }> = [
+  { value: "PSYCHOLOGISTS", label: "All active clinicians", hint: "e.g. a maintenance window or a new procedure." },
+  { value: "ADMINS", label: "Admin team", hint: "Internal heads-up." },
+  { value: "PATIENTS", label: "All active patients", hint: "Reaches every patient. Use sparingly." },
+];
+
+function BroadcastDialog({ onClose }: { onClose: () => void }) {
+  const [audienceValue, setAudience] = useState<BroadcastAudience>("PSYCHOLOGISTS");
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [priority, setPriority] = useState<"NORMAL" | "HIGH" | "URGENT">("NORMAL");
+  const mutation = useApiMutation(() => notificationsApi.broadcast({ audience: audienceValue, title: title.trim(), message: message.trim(), priority }), {
+    invalidate: ["notifications"],
+    successMessage: (r) => `Sent to ${formatNumber(r.sent)} recipient${r.sent === 1 ? "" : "s"}`,
+    onSuccess: onClose,
+  });
+  const hint = BROADCAST_AUDIENCES.find((a) => a.value === audienceValue)?.hint;
+  return (
+    <FormDialog
+      open
+      onOpenChange={(o) => !o && onClose()}
+      title="Send an announcement"
+      description="An operational message delivered in-app to a whole audience. It is recorded in the audit log with the recipient count."
+      submitLabel="Send"
+      isPending={mutation.isPending}
+      canSubmit={title.trim().length > 0 && message.trim().length > 0}
+      onSubmit={() => void mutation.mutate(undefined)}
+    >
+      <Field label="Audience" htmlFor="bc-audience" hint={hint}>
+        <Select value={audienceValue} onValueChange={(v) => setAudience(v as BroadcastAudience)}>
+          <SelectTrigger id="bc-audience"><SelectValue /></SelectTrigger>
+          <SelectContent>{BROADCAST_AUDIENCES.map((a) => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}</SelectContent>
+        </Select>
+      </Field>
+      <Field label="Title" htmlFor="bc-title">
+        <Input id="bc-title" value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} />
+      </Field>
+      <Field label="Message" htmlFor="bc-message" hint={`${message.length}/1000`}>
+        <Textarea id="bc-message" rows={4} value={message} maxLength={1000} onChange={(e) => setMessage(e.target.value)} />
+      </Field>
+      <Field label="Priority" htmlFor="bc-priority">
+        <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
+          <SelectTrigger id="bc-priority"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="NORMAL">Normal</SelectItem>
+            <SelectItem value="HIGH">High</SelectItem>
+            <SelectItem value="URGENT">Urgent</SelectItem>
+          </SelectContent>
+        </Select>
+      </Field>
+    </FormDialog>
+  );
 }
 
 export function NotificationsView() {
@@ -50,10 +109,16 @@ export function NotificationsView() {
   const { filters, update } = list;
   const [deleting, setDeleting] = useState<AdminNotification | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [broadcasting, setBroadcasting] = useState(false);
 
   const q = useApiQuery(["notifications", "list", list.params], () => notificationsApi.list(list.params));
   const total = useApiQuery(["notifications", "count"], () => notificationsApi.list({ limit: 1 }));
   const unread = useApiQuery(["notifications", "count", "unread"], () => notificationsApi.list({ read: false, limit: 1 }));
+  const summary = useApiQuery(["notifications", "summary"], () => notificationsApi.summary());
+  const markAll = useApiMutation(() => notificationsApi.markAllMineRead(), {
+    invalidate: ["notifications"],
+    successMessage: (r) => (r.updated ? `${r.updated} marked as read` : "Nothing to mark"),
+  });
 
   const markRead = useApiMutation((id: string) => notificationsApi.markRead(id), {
     invalidate: ["notifications"],
@@ -84,6 +149,11 @@ export function NotificationsView() {
     },
     { id: "type", header: "Type", hideBelow: "lg", cell: (n) => <span className="text-muted-foreground">{humanize(n.type)}</span> },
     { id: "priority", header: "Priority", cell: (n) => <StatusBadge value={n.priority} meta={NOTIFICATION_PRIORITY_META} /> },
+    {
+      id: "reference",
+      header: "Opens",
+      cell: (n) => <NotificationLink notification={n} onNavigate={() => !n.isRead && n.audience === "ADMIN" && void markRead.mutate(n.id)} />,
+    },
     { id: "audience", header: "Audience", hideBelow: "md", cell: (n) => <span className="text-muted-foreground">{audience(n)}</span> },
     {
       id: "channels",
@@ -111,7 +181,7 @@ export function NotificationsView() {
       header: "Sent",
       cell: (n) => (
         <div>
-          <p className="text-[13px]">{formatDateTime(n.sentAt ?? n.createdAt)}</p>
+          <p className="text-[13px]">{formatDateTime(n.createdAt)}</p>
           <p className="text-xs text-muted-foreground">
             {n.isRead && n.readAt ? `Read ${formatRelative(n.readAt)}` : "Not read"}
           </p>
@@ -163,6 +233,16 @@ export function NotificationsView() {
       <PageHeader
         title="Notifications"
         description="Every message the platform sent to patients, clinicians and the admin team. Deleting a record clears the log but cannot recall a message already delivered."
+        actions={
+          <Can permission="notifications.manage">
+            <Button size="sm" variant="outline" loading={markAll.isPending} onClick={() => void markAll.mutate(undefined)} disabled={!summary.data?.mineUnread}>
+              <CheckCheck /> Mark my inbox read{summary.data?.mineUnread ? ` (${summary.data.mineUnread})` : ""}
+            </Button>
+            <Button size="sm" onClick={() => setBroadcasting(true)}>
+              <Megaphone /> Send announcement
+            </Button>
+          </Can>
+        }
       />
 
       <StatGrid>
@@ -193,6 +273,18 @@ export function NotificationsView() {
 
       <ListCard title="Delivery log" description="Newest first">
         <FilterBar onReset={list.reset} canReset={list.isFiltered}>
+          <SelectFilter
+            label="Audience"
+            allLabel="Everyone"
+            value={filters.mine ? "MINE" : filters.audience}
+            options={[
+              { value: "MINE", label: "My admin inbox" },
+              { value: "ADMIN", label: `Admin team${summary.data ? ` · ${summary.data.unread.ADMIN} unread` : ""}` },
+              { value: "PSYCHOLOGIST", label: `Clinicians${summary.data ? ` · ${summary.data.unread.PSYCHOLOGIST} unread` : ""}` },
+              { value: "PATIENT", label: `Patients${summary.data ? ` · ${summary.data.unread.PATIENT} unread` : ""}` },
+            ]}
+            onChange={(v) => update(v === "MINE" ? { mine: true, audience: undefined } : { mine: undefined, audience: v as NotificationAudience | undefined })}
+          />
           <SelectFilter
             label="Type"
             value={filters.type}
@@ -235,6 +327,8 @@ export function NotificationsView() {
           />
         )}
       </ListCard>
+
+      {broadcasting && <BroadcastDialog onClose={() => setBroadcasting(false)} />}
 
       <ConfirmDialog
         open={!!deleting}

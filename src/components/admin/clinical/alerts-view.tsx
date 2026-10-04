@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BellRing, Route, ShieldAlert, ShieldCheck } from "lucide-react";
 import { DataTable, Pagination } from "@/components/admin/shared/data-table";
 import { BooleanFilter, DateRangeFilter, FilterBar, optionsFrom, SelectFilter } from "@/components/admin/shared/filters";
@@ -17,6 +17,7 @@ import { ALERT_TYPE_META, RISK_META } from "@/lib/constants/status";
 import { formatNumber } from "@/lib/formatters";
 import { ALERT_TYPES, RISK_LEVELS, type AlertStatus, type AlertType, type ClinicalAlert, type RiskLevel } from "@/types/admin";
 import { AlertDrawer, alertColumns } from "./alerts-parts";
+import { AlertsInsights } from "./alerts-insights";
 
 type Filters = Omit<AlertFilters, "page" | "limit">;
 
@@ -24,11 +25,17 @@ const INITIAL: Filters = { status: "OPEN" };
 const URL_KEYS = ["status", "severity", "type", "unrouted", "sla_breached", "from", "to"] as const satisfies readonly (keyof Filters)[];
 const columns = alertColumns();
 
-export function ClinicalAlertsView() {
+export function ClinicalAlertsView({ focus }: { focus?: string }) {
   const list = useListState<Filters>(INITIAL, 20, { id: "clinical-alerts", urlKeys: URL_KEYS });
   const { filters, update } = list;
   const prefs = useTablePrefs("clinical-alerts");
   const [selected, setSelected] = useState<ClinicalAlert | null>(null);
+  // Deep link (e.g. from a notification): open the alert's drawer whatever the queue filter shows.
+  const focused = useApiQuery(["clinical-alerts", "focus", focus], () => alertsApi.list({ id: focus, limit: 1 }), { enabled: !!focus });
+  const focusedAlert = focused.data?.data[0];
+  useEffect(() => {
+    if (focusedAlert) setSelected(focusedAlert);
+  }, [focusedAlert]);
   const totals = useAlertCounts({ live: true });
 
   const q = useApiQuery(["clinical-alerts", "list", list.params], () => alertsApi.list(list.params), { keepPrevious: true });
@@ -88,6 +95,8 @@ export function ClinicalAlertsView() {
           active={filters.sla_breached === true && filters.status === undefined}
         />
       </StatGrid>
+
+      <AlertsInsights />
 
       <ListCard title="Alert queue" description="Newest alerts first · counts refresh every minute">
         <QueueTabs<AlertStatus>

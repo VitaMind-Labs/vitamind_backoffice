@@ -9,10 +9,8 @@ import { EmptyState, ErrorState } from "@/components/admin/shared/states";
 import { RiskBadge, SlaBadge, StatusBadge } from "@/components/admin/shared/status-badge";
 import { useApiQuery } from "@/hooks/admin/use-api-query";
 import { alertsApi, crisisApi } from "@/lib/api/clinical";
-import { paymentsApi } from "@/lib/api/payments";
-import { usersApi } from "@/lib/api/users";
-import { ALERT_STATUS_META, PAYMENT_STATUS_META, USER_STATUS_META } from "@/lib/constants/status";
-import { formatMoney, formatRelative, humanize, patientRef } from "@/lib/formatters";
+import { ALERT_STATUS_META } from "@/lib/constants/status";
+import { formatRelative, humanize, patientRef } from "@/lib/formatters";
 
 function Panel({
   title,
@@ -129,60 +127,6 @@ export function OpenAlertsPanel() {
               }
               secondary={`${humanize(a.type)} · ${a.routedTo ? `Routed to ${a.routedTo.firstName} ${a.routedTo.lastName}` : "Unrouted"}`}
               trailing={a.slaBreached ? <SlaBadge breached /> : <StatusBadge value={a.status} meta={ALERT_STATUS_META} />}
-            />
-          ))}
-        </ul>
-      )}
-    </Panel>
-  );
-}
-
-export function RecentUsersPanel() {
-  const q = useApiQuery(["users", "dashboard-recent"], () => usersApi.list({ limit: 6, sort_by: "created_at", order: "desc" }));
-  return (
-    <Panel title="Recent sign-ups" href="/admin/users">
-      {q.error ? (
-        <ErrorState error={q.error} onRetry={q.refetch} compact />
-      ) : !q.data ? (
-        <PanelSkeleton />
-      ) : q.data.data.length === 0 ? (
-        <EmptyState compact title="No users yet" />
-      ) : (
-        <ul className="divide-y">
-          {q.data.data.map((u) => (
-            <Row
-              key={u.id}
-              href={`/admin/users/${u.id}`}
-              primary={patientRef(u.patientNumber)}
-              secondary={`${u.subscriptionPlan?.tier ?? "No plan"} · joined ${formatRelative(u.createdAt)}`}
-              trailing={<StatusBadge value={u.status} meta={USER_STATUS_META} />}
-            />
-          ))}
-        </ul>
-      )}
-    </Panel>
-  );
-}
-
-export function RecentPaymentsPanel() {
-  const q = useApiQuery(["payments", "dashboard-recent"], () => paymentsApi.list({ limit: 6, sort_by: "created_at", order: "desc" }));
-  return (
-    <Panel title="Recent payments" href="/admin/payments">
-      {q.error ? (
-        <ErrorState error={q.error} onRetry={q.refetch} compact />
-      ) : !q.data ? (
-        <PanelSkeleton />
-      ) : q.data.data.length === 0 ? (
-        <EmptyState compact title="No payments recorded" />
-      ) : (
-        <ul className="divide-y">
-          {q.data.data.map((p) => (
-            <Row
-              key={p.id}
-              href={`/admin/payments?focus=${p.id}`}
-              primary={<span className="tabular-nums">{formatMoney(p.amount, p.currency)}</span>}
-              secondary={`${patientRef(p.user?.patientNumber)} · ${formatRelative(p.createdAt)}`}
-              trailing={<StatusBadge value={p.status} meta={PAYMENT_STATUS_META} />}
             />
           ))}
         </ul>

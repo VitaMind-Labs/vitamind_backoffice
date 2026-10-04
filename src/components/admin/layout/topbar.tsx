@@ -20,7 +20,10 @@ import {
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAdminSession } from "@/components/admin/providers/admin-session-provider";
 import { TwoFactorSetup } from "@/components/admin/auth/two-factor-setup";
+import { useNotificationTarget } from "@/components/admin/notifications/notification-link";
+import { useApiMutation } from "@/hooks/admin/use-api-mutation";
 import { useApiQuery } from "@/hooks/admin/use-api-query";
+import type { AdminNotification } from "@/types/admin";
 import { notificationsApi } from "@/lib/api/operations";
 import { findNavItem } from "@/lib/constants/navigation";
 import { NOTIFICATION_PRIORITY_META } from "@/lib/constants/status";
@@ -57,13 +60,40 @@ function Breadcrumbs() {
   );
 }
 
+/** One inbox row: opens the page the notification is about (falls back to the notification centre) and marks it read. */
+function BellItem({ notification: n, onOpen }: { notification: AdminNotification; onOpen: () => void }) {
+  const target = useNotificationTarget(n);
+  return (
+    <DropdownMenuItem asChild className="items-start">
+      <Link href={target?.href ?? "/admin/notifications"} onClick={onOpen}>
+        <span
+          className={cn(
+            "mt-1.5 size-1.5 shrink-0 rounded-full",
+            n.priority === "URGENT" ? "bg-destructive" : n.priority === "HIGH" ? "bg-warning" : "bg-primary",
+          )}
+          aria-label={NOTIFICATION_PRIORITY_META[n.priority].label}
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[13px] font-medium">{n.title}</span>
+          <span className="block text-xs text-muted-foreground">
+            {formatRelative(n.createdAt)}
+            {target ? ` · ${target.label}` : ""}
+          </span>
+        </span>
+      </Link>
+    </DropdownMenuItem>
+  );
+}
+
 function NotificationsMenu() {
   const { can } = useAdminSession();
   const enabled = can("notifications.view");
-  const { data } = useApiQuery(["notifications", "unread-preview"], () => notificationsApi.list({ read: false, limit: 5 }), {
+  // The bell is this admin's own inbox — not every unread message the platform sent to patients and clinicians.
+  const { data } = useApiQuery(["notifications", "unread-preview"], () => notificationsApi.list({ mine: true, read: false, limit: 5 }), {
     enabled,
     staleTime: 60_000,
   });
+  const markRead = useApiMutation((id: string) => notificationsApi.markRead(id), { invalidate: ["notifications"] });
   if (!enabled) return null;
   const unread = data?.total ?? 0;
 
@@ -87,21 +117,7 @@ function NotificationsMenu() {
         <div className="max-h-80 overflow-y-auto p-1">
           {data?.data.length ? (
             data.data.map((n) => (
-              <DropdownMenuItem key={n.id} asChild className="items-start">
-                <Link href="/admin/notifications">
-                  <span
-                    className={cn(
-                      "mt-1.5 size-1.5 shrink-0 rounded-full",
-                      n.priority === "URGENT" ? "bg-destructive" : n.priority === "HIGH" ? "bg-warning" : "bg-primary",
-                    )}
-                    aria-label={NOTIFICATION_PRIORITY_META[n.priority].label}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-medium">{n.title}</span>
-                    <span className="block text-xs text-muted-foreground">{formatRelative(n.createdAt)}</span>
-                  </span>
-                </Link>
-              </DropdownMenuItem>
+              <BellItem key={n.id} notification={n} onOpen={() => void markRead.mutate(n.id)} />
             ))
           ) : (
             <p className="px-3 py-6 text-center text-[13px] text-muted-foreground">You’re all caught up.</p>
