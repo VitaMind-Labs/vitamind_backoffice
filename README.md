@@ -1,110 +1,165 @@
 # VitaMind Backoffice
 
-Admin console for the VitaMind platform: patient safety queues, clinician operations, finance and system health.
-Next.js (App Router) + Tailwind + shadcn/ui, talking to the NestJS API in `../vitamind_backend/apps/api`.
+VitaMind Backoffice is the operational command center for the VitaMind platform. It gives administrators, operations teams, and clinical coordinators a secure workspace to monitor patient risk, manage clinical workflows, review financial activity, and maintain platform health across the product ecosystem.
 
-## Run it
+This project is built with Next.js, React, TypeScript, Tailwind CSS, and shadcn/ui, and it communicates with the VitaMind backend through a secure proxy layer designed for admin operations.
+
+## Why this product exists
+
+The back office is designed for high-responsibility operational decisions. It brings together:
+
+- Patient and clinical oversight
+- Crisis and alert triage
+- Subscription and billing visibility
+- System health monitoring
+- Staff, clinic, and assignment management
+- Operational reporting and export workflows
+
+It is built to help teams move quickly while keeping permissions, auditability, and workflow clarity in place.
+
+## Core features
+
+- Role-based admin dashboard and operational overview
+- Crisis and clinical alert queue management
+- User and patient record monitoring
+- Diagnostic funnel and risk visibility
+- Payment and subscription review tools
+- Notification and message routing
+- Clinic, psychologist, and assignment management
+- Coverage and staffing oversight
+- CSV export and reporting workflows
+- Secure backend proxy with API routing and access control
+
+## Technology stack
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript 5
+- Tailwind CSS 4
+- shadcn/ui + Radix UI
+- Recharts for analytics and trend charts
+- Framer Motion for interface motion
+- Zod + React Hook Form for validation and forms
+- ESLint for quality checks
+
+## Project structure
+
+```text
+vitamind_backoffice/
+├── src/
+│   ├── app/                 # App routes, layouts, and API proxies
+│   ├── components/          # Shared UI and feature-level components
+│   ├── contexts/            # Shared app state providers
+│   ├── hooks/               # Query, mutation, and state hooks
+│   ├── lib/                 # API clients, constants, permissions, utilities
+│   ├── types/               # Shared TypeScript interfaces
+│   └── actions/             # Supporting actions (legacy or integration logic)
+├── public/                  # Static assets
+├── package.json             # Scripts and dependencies
+├── next.config.ts           # Next.js config
+├── tsconfig.json            # TypeScript config
+├── .env.local.example       # Optional local env example
+├── README.md                # Project documentation
+├── CLAUDE.md                # Local engineering notes
+└── .gitignore               # Git safety settings
+```
+
+## Prerequisites
+
+Before running this app, make sure you have:
+
+- Node.js 20+
+- npm 10+
+- A running VitaMind backend API
+
+## Quick start
+
+Install dependencies:
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000 (webpack)
-npm run build && npm start
 ```
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `API_URL` (or `NEXT_PUBLIC_API_URL`) | `http://localhost:5000` | Base URL of the VitaMind API |
+Start the development server:
 
-The backend must be running (and restarted after backend changes) for pages to load data.
-
-## How it talks to the API
-
-```
-Browser ──► /api/admin/<path> ──► {API_URL}/api/v1/admin/<path>      (Next route handler = BFF)
-Browser ──► /api/auth/<action> ─► {API_URL}/api/v1/auth/admin/<action>
+```bash
+npm run dev
 ```
 
-- Tokens live in httpOnly cookies. The browser never sees them; the proxy (`src/app/api/admin/[...path]/route.ts`)
-  attaches the Bearer token, refreshes once on 401, and streams JSON and CSV back unchanged.
-- Client code calls `lib/api/*.ts` (`api.get/post/patch/put/delete`). Responses are unwrapped from the
-  `{ success, data }` envelope and errors become `ApiError` with a readable message.
-- Roles (`SUPER_ADMIN`, `ADMIN`, `FINANCE`, `SUPPORT`) are mirrored in `lib/permissions` to hide what a role cannot use.
-  The backend `RolesGuard` stays the authority.
+Then open:
 
-## One feature, one page
+- http://localhost:3000
 
-Each capability lives on exactly one page. Other pages link to it instead of re-implementing it.
+Create a production build:
 
-| Group | Page | Route | Owns | API (`/api/v1/admin/…`) |
-| --- | --- | --- | --- | --- |
-| Overview | Dashboard | `/admin/dashboard` | Headline KPIs, risk distribution, "needs attention" triage | `dashboard/*` |
-| | System health | `/admin/system` | Component health, backlogs, AI engines, breaker reset | `system/*` |
-| Patients | Users | `/admin/users`, `/admin/users/[id]` | Accounts, status, subscription tier, payments of one user, **risk trajectory** | `users/*` |
-| | Diagnostics | `/admin/diagnostics` | Mira sessions, funnel, abandonment | `diagnostics/*` |
-| Clinical | Crisis events | `/admin/crisis-events` | Crisis queue and handling (take, resolve, escalate, false alert) | `crisis-events/*` |
-| | Clinical alerts | `/admin/clinical-alerts` | Alert queue and rerouting | `clinical-alerts/*` |
-| Analytics | Detection quality | `/admin/model-drift` | Crisis-rate drift and false positives | `model-drift`, `false-positives` |
-| Finance | Payments | `/admin/payments` | Transactions, outcomes, revenue, subscribers, refunds | `payments/*` |
-| | Subscription plans | `/admin/subscription-plans` | Plan catalogue | `payments/subscription-plans/*` |
-| Operations | Notifications | `/admin/notifications` | Delivery log, own inbox, announcements | `notifications/*` |
-| | Clinics | `/admin/clinics` | Clinic records | `clinics/*` |
-| | Psychologists | `/admin/psychologists` | Clinician directory, profile, status, caseload | `psychologists/*` |
-| | Assignments | `/admin/assignments` | Patient ↔ clinician circuit (assign, end, primary) | `assignments/*` |
-| | Coverage | `/admin/coverage` | Absence / on-call cover | `coverage/*` |
-| | Licences | `/admin/licenses` | Licence verification queue | `psychologists/:id/license/*` |
-| Data | Exports | `/admin/exports` | CSV exports (reason required, audited) | `export/*` |
-
-Redirects kept for old links: `/admin/risk-history` → user detail, `/admin/false-positives` → Detection quality.
-`/admin/sessions` and `/admin/behavioural-analytics` return 404 (the backend has no such endpoints).
-
-### Dashboard vs. owner pages
-
-The dashboard shows summary numbers and links; it does not repeat charts. Diagnostics funnel → Diagnostics,
-payment outcomes and plans → Payments, risk history → user detail.
-
-## Notifications → pages
-
-The API attaches `reference: { kind, id }` to every notification (resolved server-side from its type and payload).
-The single mapping from `kind` to page is `notificationTarget()` in `src/lib/constants/navigation.ts`;
-it is used by the notifications table ("Opens" column) and the bell.
-
-| `kind` | Opens | Landing |
-| --- | --- | --- |
-| `CRISIS_EVENT` | Crisis events | `?focus=<id>` opens the event |
-| `CLINICAL_ALERT` | Clinical alerts | `?focus=<id>` opens the alert drawer |
-| `ASSIGNMENT` | Assignments | `?focus=<id>` narrows the list to it |
-| `PSYCHOLOGIST` | Psychologists | `?focus=<id>` opens the profile |
-| `LICENSE` | Licences | `?focus=<id>` opens the verification |
-| `PAYMENT` | Payments | `?focus=<id>` opens the payment |
-| `COVERAGE` | Coverage | whole-team screen |
-| `PATIENT` | `/admin/users/<id>` | patient record |
-
-Secure messages and report escalations never carry a reference (clinician-only content). The bell shows the
-signed-in admin's own inbox only; the Notifications page is the cross-audience delivery log.
-To add a new target: extend `NotificationReferenceKind` (backend `notification-reference.ts` + `types/admin/models.ts`)
-and add one line to `TARGETS`.
-
-## Layout of `src`
-
-```
-app/admin/*            pages (thin: permission gate + view)
-app/api/…              BFF route handlers (admin proxy, auth)
-components/admin/*     views per feature, shared/ (tables, filters, dialogs), charts/, layout/
-hooks/admin/*          useApiQuery, useApiMutation, useListState (URL-synced filters), table prefs
-lib/api/*              typed endpoint clients, one file per backend area
-lib/constants/         navigation (sidebar + notification targets), status metadata
-lib/permissions        role → permission map
-types/admin/*          API types
+```bash
+npm run build
 ```
 
-## Known gaps
+Run the production build locally:
 
-- `GET /export/psychiatric-report/:userId` answers 501 in the backend; there is no UI for it.
-- Payment refunds answer 501 until a payment provider is integrated.
-- The backend still exposes both `GET /payments/user/:userId` and `GET /users/:id/payments`; the UI uses the latter.
-- Unused legacy files from the earlier app (`src/app/[sessionId]`, `src/actions`, `components/admin/pages`, …)
-  are still on disk and can be deleted; nothing reachable imports them.
+```bash
+npm run start
+```
 
-## Working rules
+## Environment variables
 
-No git commands from tooling; changes stay on disk and are committed manually. See `CLAUDE.md`.
+Create a `.env.local` file if needed:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+If `NEXT_PUBLIC_API_URL` is not set, the app will expect the local API at the default VitaMind backend URL.
+
+## How it integrates with the backend
+
+This back office uses a proxy architecture to keep sensitive admin traffic behind a controlled boundary.
+
+```text
+Browser -> /api/admin/... -> Backend API -> Data/Reports/Operational services
+```
+
+The app is organized around typed API clients and route-level permission checks. Authentication and sensitive data handling follow the platform's admin access model.
+
+## Main admin areas
+
+- Dashboard: operational summary and prioritization
+- Users: patient account overview and health risk context
+- Diagnostics: clinical funnel and process metrics
+- Crisis events: incident workflow and escalation handling
+- Clinical alerts: triage and workflow routing
+- Payments: billing data and financial reporting
+- Psychologists and clinics: provider portfolio management
+- Assignments and coverage: coordination and capacity tracking
+- Notifications and exports: communication and operational reporting
+
+## Security and compliance expectations
+
+This workspace is intended for operational and administrative workflows. The following practices are expected:
+
+- Use role-based access controls strictly
+- Never expose secrets or credentials in client code or logs
+- Treat all API responses as untrusted data
+- Validate assumptions before acting on sensitive patient or financial information
+- Keep development data sanitized and de-identified
+
+## Quality checks
+
+Run the relevant validation before shipping changes:
+
+```bash
+npm run lint
+npm run build
+```
+
+## Contribution guidance
+
+1. Work in a focused branch.
+2. Keep UI and backend integration changes scoped and readable.
+3. Validate the affected routes and flows before merge.
+4. Avoid committing environment files, generated output, or local credentials.
+
+## License
+
+This project does not declare a public license in the repo. Treat the code as proprietary unless explicitly stated otherwise by the project owner.
