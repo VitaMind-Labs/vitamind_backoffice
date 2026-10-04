@@ -280,7 +280,7 @@ export function ClinicsView() {
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}
         title={`Remove ${deleting?.name ?? "this clinic"}?`}
-        description="The clinic is removed from the back office. Its clinicians and existing alert history are not modified. Alerts already routed there stay routed."
+        description="The clinic is removed from the admin console. Its clinicians and existing alert history are not modified. Alerts already routed there stay routed."
         confirmLabel="Remove clinic"
         destructive
         reason={{ label: "Reason", placeholder: "Why is this clinic being removed?", maxLength: 300, required: false }}

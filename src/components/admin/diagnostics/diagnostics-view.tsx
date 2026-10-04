@@ -153,7 +153,7 @@ function DiagnosticDrawer({ id, onClose }: { id: string | null; onClose: () => v
             <DetailRow label="Expires">{d.expiresAt ? formatDateTime(d.expiresAt) : "No expiry"}</DetailRow>
           </DetailSection>
           <PrivacyNote>
-            Mira prompts, patient answers and generated reports are never available in the back office. Only session metadata is
+            Mira prompts, patient answers and generated reports are never available in the admin platform. Only session metadata is
             shown.
           </PrivacyNote>
         </>

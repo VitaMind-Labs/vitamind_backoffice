@@ -61,7 +61,7 @@ export function AuthBrandPanel() {
         <div className="space-y-3">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-auth-panel-muted backdrop-blur">
             <Activity className="size-3.5 text-brand-gold" aria-hidden />
-            Clinical operations back office
+            Clinical operations admin
           </span>
           <h2 className="text-[32px] font-semibold leading-[1.15] tracking-tight">
             Patient safety signals,

@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 export function BrandMark({ collapsed }: { collapsed?: boolean }) {
   return (
-    <Link href="/admin" className="flex min-w-0 items-center justify-center gap-2.5" aria-label="VitaMind back office">
+    <Link href="/admin" className="flex min-w-0 items-center justify-center gap-2.5" aria-label="VitaMind Admin">
       <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-transparent">
         <Image
           src="/logo.svg"

@@ -89,7 +89,7 @@ function OverviewTab({ user }: { user: AdminUserDetail }) {
         </DetailSection>
       </div>
       <PrivacyNote>
-        Mira transcripts, summaries, reports, journal content and clinician notes are never available in the back office.
+        Mira transcripts, summaries, reports, journal content and clinician notes are never available in the admin platform.
       </PrivacyNote>
     </div>
   );

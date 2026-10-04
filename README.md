@@ -1,12 +1,12 @@
-# VitaMind Backoffice
+# VitaMind Admin
 
-VitaMind Backoffice is the operational command center for the VitaMind platform. It gives administrators, operations teams, and clinical coordinators a secure workspace to monitor patient risk, manage clinical workflows, review financial activity, and maintain platform health across the product ecosystem.
+VitaMind Admin is the operational command center for the VitaMind platform. It gives administrators, operations teams, and clinical coordinators a secure workspace to monitor patient risk, manage clinical workflows, review financial activity, and maintain platform health across the product ecosystem.
 
-This project is built with Next.js, React, TypeScript, Tailwind CSS, and shadcn/ui, and it communicates with the VitaMind backend through a secure proxy layer designed for admin operations.
+This project is built with Next.js, React, TypeScript, Tailwind CSS, and shadcn/ui, and it communicates with the VitaMind backend through a secure proxy layer designed for administrative operations.
 
 ## Why this product exists
 
-The back office is designed for high-responsibility operational decisions. It brings together:
+The administration platform is designed for high-responsibility operational decisions. It brings together:
 
 - Patient and clinical oversight
 - Crisis and alert triage
@@ -114,7 +114,7 @@ If `NEXT_PUBLIC_API_URL` is not set, the app will expect the local API at the de
 
 ## How it integrates with the backend
 
-This back office uses a proxy architecture to keep sensitive admin traffic behind a controlled boundary.
+This admin platform uses a proxy architecture to keep sensitive administrative traffic behind a controlled boundary.
 
 ```text
 Browser -> /api/admin/... -> Backend API -> Data/Reports/Operational services
@@ -136,7 +136,7 @@ The app is organized around typed API clients and route-level permission checks.
 
 ## Security and compliance expectations
 
-This workspace is intended for operational and administrative workflows. The following practices are expected:
+This workspace is intended for operational and administrative workflows in a professional healthcare environment. The following practices are expected:
 
 - Use role-based access controls strictly
 - Never expose secrets or credentials in client code or logs
