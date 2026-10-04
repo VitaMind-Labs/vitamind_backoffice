@@ -7,7 +7,8 @@ import { ThresholdMeter } from "@/components/admin/analytics/threshold-meter";
 import { BreakdownBarChart } from "@/components/admin/charts/breakdown-bar-chart";
 import { ChartCard } from "@/components/admin/charts/chart-card";
 import { CATEGORICAL } from "@/components/admin/charts/chart-theme";
-import { PageHeader } from "@/components/admin/shared/page-header";
+import { FalsePositivesSection } from "@/components/admin/analytics/false-positives-section";
+import { PageHeader, SectionHeader } from "@/components/admin/shared/page-header";
 import { RequirePermission } from "@/components/admin/shared/permission";
 import { StatCard, StatGrid } from "@/components/admin/shared/stat-card";
 import { ErrorState } from "@/components/admin/shared/states";
@@ -17,7 +18,7 @@ import { formatNumber, parsePercent } from "@/lib/formatters";
 
 const DRIFT_THRESHOLD = 5;
 
-function ModelDriftView() {
+function DriftSection() {
   const q = useApiQuery(["analytics", "model-drift"], analyticsApi.modelDrift);
   const d = q.data;
   const rate = parsePercent(d?.crisisRate) ?? 0;
@@ -25,7 +26,7 @@ function ModelDriftView() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
+      <SectionHeader
         title="Model drift"
         description="Watches the share of sessions flagged as crisis over the last 7 days. A rate above 5% suggests the detection model may be drifting."
       />
@@ -122,10 +123,20 @@ function ModelDriftView() {
   );
 }
 
-export default function ModelDriftPage() {
+export default function DetectionQualityPage() {
   return (
     <RequirePermission permission="analytics.view">
-      <ModelDriftView />
+      <div className="space-y-8">
+        <PageHeader
+          title="Detection quality"
+          description="How well crisis detection is performing: whether the crisis rate is drifting, and how many alerts turn out to be false."
+        />
+        <DriftSection />
+        <div className="space-y-4 border-t pt-8">
+          <SectionHeader title="False positives" description="Crisis events closed as false alerts, and which detection channels produce them." />
+          <FalsePositivesSection />
+        </div>
+      </div>
     </RequirePermission>
   );
 }

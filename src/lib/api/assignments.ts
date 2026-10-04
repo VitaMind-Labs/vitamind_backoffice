@@ -1,7 +1,11 @@
 import { api } from "./client";
 import type {
   AssignmentInput,
+  AssignmentStage,
   AssignmentStatus,
+  PsychologistDetail,
+  PsychologistStatusResult,
+  PsychologistUpdateInput,
   PageQuery,
   Paginated,
   PatientAssignment,
@@ -10,9 +14,11 @@ import type {
 } from "@/types/admin";
 
 export interface AssignmentFilters extends PageQuery {
+  id?: string;
   userId?: string;
   psychologistId?: string;
   status?: AssignmentStatus;
+  stage?: AssignmentStage;
 }
 
 export interface DirectoryFilters extends PageQuery {
@@ -26,4 +32,12 @@ export const assignmentsApi = {
   create: (input: AssignmentInput) => api.post<PatientAssignment>("/assignments", input),
   end: (id: string, reason: string) => api.patch<PatientAssignment>(`/assignments/${id}/end`, { reason }),
   makePrimary: (id: string) => api.patch<PatientAssignment>(`/assignments/${id}/primary`),
+};
+
+export const psychologistsApi = {
+  directory: assignmentsApi.directory,
+  get: (id: string) => api.get<PsychologistDetail>(`/psychologists/${id}`),
+  setStatus: (id: string, status: PsychologistStatus, reason: string) =>
+    api.patch<PsychologistStatusResult>(`/psychologists/${id}/status`, { status, reason }),
+  update: (id: string, input: PsychologistUpdateInput) => api.patch<PsychologistUpdateInput>(`/psychologists/${id}`, input),
 };

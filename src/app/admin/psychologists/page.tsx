@@ -1,18 +1,18 @@
 "use client";
 
 import { use } from "react";
-import { LicensesView } from "@/components/admin/licenses/licenses-view";
+import { PsychologistsView } from "@/components/admin/psychologists/psychologists-view";
 import { RequirePermission } from "@/components/admin/shared/permission";
 
-export default function LicensesPage({
+export default function PsychologistsPage({
   searchParams,
 }: {
   searchParams: Promise<{ focus?: string }>;
 }) {
   const { focus } = use(searchParams);
   return (
-    <RequirePermission permission="licenses.manage">
-      <LicensesView focus={focus} />
+    <RequirePermission permission="psychologists.view">
+      <PsychologistsView focus={focus} />
     </RequirePermission>
   );
 }

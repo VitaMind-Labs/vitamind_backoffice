@@ -1,5 +1,6 @@
 import { api } from "./client";
 import type {
+  AlertsSummary,
   AlertStatus,
   AlertType,
   ClinicalAlert,
@@ -24,6 +25,7 @@ export interface CrisisFilters extends PageQuery {
 }
 
 export interface AlertFilters extends PageQuery {
+  id?: string;
   status?: AlertStatus;
   severity?: RiskLevel;
   type?: AlertType;
@@ -46,6 +48,7 @@ export const crisisApi = {
 
 export const alertsApi = {
   list: (filters: AlertFilters) => api.get<Paginated<ClinicalAlert>>("/clinical-alerts", { ...filters }),
+  summary: () => api.get<AlertsSummary>("/clinical-alerts/summary"),
   reroute: (id: string, input: { psychologistId: string; reason: string }) =>
     api.patch<ClinicalAlert>(`/clinical-alerts/${id}/reroute`, input),
 };

@@ -25,6 +25,12 @@ const PERMISSIONS = {
   // Clinical operations & telemetry
   "assignments.view": ["ADMIN"],
   "assignments.manage": ["ADMIN"],
+  "psychologists.view": ["ADMIN"],
+  "psychologists.manage": ["ADMIN"],
+  "coverage.view": ["ADMIN"],
+  "coverage.manage": ["ADMIN"],
+  "system.view": ["ADMIN"],
+  "system.manage": ["ADMIN"],
   "crisis.view": ["ADMIN"],
   "crisis.manage": ["ADMIN"],
   "alerts.view": ["ADMIN"],
@@ -33,11 +39,11 @@ const PERMISSIONS = {
   "analytics.view": ["ADMIN"],
 
   // Finance
-  "payments.view": ["FINANCE"],
-  "payments.refund": ["FINANCE"],
+  "payments.view": ["ADMIN", "FINANCE"],
+  "payments.refund": ["ADMIN", "FINANCE"],
   "payments.status": [],
-  "plans.view": ["FINANCE"],
-  "plans.manage": ["FINANCE"],
+  "plans.view": ["ADMIN", "FINANCE"],
+  "plans.manage": ["ADMIN", "FINANCE"],
 
   // Operations
   "notifications.view": ["ADMIN"],

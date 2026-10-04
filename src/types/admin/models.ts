@@ -168,7 +168,7 @@ export interface ModelDrift {
   alert: string | null;
   byAgent: {
     mira: { sessions7d: number; crisis7d: number };
-    lumina: { interactions7d: number; crisis7d: number };
+    journal: { analyses7d: number; flagged7d: number };
   };
 }
 
@@ -404,11 +404,28 @@ export interface SubscriptionPlanInput {
 
 /* --------------------------------------------------------- Notifications */
 
+export type NotificationReferenceKind =
+  | "CRISIS_EVENT"
+  | "CLINICAL_ALERT"
+  | "ASSIGNMENT"
+  | "PSYCHOLOGIST"
+  | "COVERAGE"
+  | "LICENSE"
+  | "PAYMENT"
+  | "PATIENT";
+
+/** The record a notification is about; `notificationTarget` maps it to the one page that owns that record. */
+export interface NotificationReference {
+  kind: NotificationReferenceKind;
+  id: string;
+}
+
 export interface AdminNotification {
   id: string;
-  userId: string | null;
-  adminId: string | null;
-  psychologistId: string | null;
+  reference: NotificationReference | null;
+  audience: "ADMIN" | "PSYCHOLOGIST" | "PATIENT";
+  /** Patient code, clinician name or admin e-mail. */
+  recipient: string | null;
   type: NotificationType;
   priority: NotificationPriority;
   title: string;
@@ -416,7 +433,6 @@ export interface AdminNotification {
   isRead: boolean;
   readAt: string | null;
   channels: string[];
-  sentAt: string | null;
   createdAt: string;
   user: { id: string; patientNumber: number } | null;
 }
@@ -483,11 +499,20 @@ export interface PsychologistDirectoryEntry {
   createdAt: string;
   clinic: { id: string; name: string } | null;
   activeCaseload: number;
+  lastLoginAt: string | null;
+  is2FAEnabled: boolean;
+  /** Patient requests this clinician has not answered yet. */
+  awaitingClinician: number;
+  oldestRequestAt: string | null;
 }
 
 export interface PatientAssignment {
   id: string;
   status: AssignmentStatus;
+  stage: import("./ops").AssignmentStage;
+  psychologistAcceptedAt: string | null;
+  psychologistDeclinedAt: string | null;
+  declineReason: string | null;
   isPrimary: boolean;
   assignedAt: string;
   consentedAt: string | null;

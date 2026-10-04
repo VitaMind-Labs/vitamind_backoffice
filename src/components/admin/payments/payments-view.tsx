@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { CircleCheck, CircleDollarSign, Percent, ReceiptText } from "lucide-react";
-import { BreakdownBarChart } from "@/components/admin/charts/breakdown-bar-chart";
 import { ChartCard } from "@/components/admin/charts/chart-card";
 import { DistributionBar } from "@/components/admin/charts/distribution-bar";
 import { countsToBreakdown, groupByToCounts, sumCounts } from "@/components/admin/charts/transform";
@@ -18,6 +17,7 @@ import { PAYMENT_STATUS_META } from "@/lib/constants/status";
 import { formatCompact, formatMoney, formatNumber, formatPercent } from "@/lib/formatters";
 import { PAYMENT_STATUSES, type PaymentStatus } from "@/types/admin";
 import { PaymentDrawer, paymentColumns } from "../payments/payment-parts";
+import { FinanceTrends } from "./finance-trends";
 
 type Filters = Omit<PaymentFilters, "page" | "limit">;
 
@@ -33,46 +33,36 @@ function FinanceCharts() {
   });
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <ChartCard
-        title="Payment outcomes"
-        description="All recorded payments by status"
-        isLoading={statistics.isLoading}
-        error={statistics.error}
-        onRetry={statistics.refetch}
-        isEmpty={sumCounts(counts) === 0}
-        height={200}
-        table={{ columns: ["Status", "Payments"], rows: rows.map((r) => [r.label, formatNumber(r.value)]) }}
-      >
-        <DistributionBar
-          ariaLabel="Payments by status"
-          segments={PAYMENT_STATUSES.map((status) => ({
-            key: status,
-            label: PAYMENT_STATUS_META[status].label,
-            value: counts[status] ?? 0,
-            color: PAYMENT_STATUS_META[status].chart,
-          }))}
-        />
-      </ChartCard>
-      <ChartCard
-        title="Status breakdown"
-        description="Same figures as counts, for quick comparison"
-        isLoading={statistics.isLoading}
-        error={statistics.error}
-        onRetry={statistics.refetch}
-        isEmpty={sumCounts(counts) === 0}
-        table={{ columns: ["Status", "Payments", "Share"], rows: rows.map((r) => [r.label, formatNumber(r.value), formatPercent((r.value / Math.max(sumCounts(counts), 1)) * 100)]) }}
-      >
-        <BreakdownBarChart data={rows} valueLabel="Payments" total={sumCounts(counts)} />
-      </ChartCard>
-    </div>
+    <ChartCard
+      title="Payment outcomes"
+      description="All recorded payments by status"
+      isLoading={statistics.isLoading}
+      error={statistics.error}
+      onRetry={statistics.refetch}
+      isEmpty={sumCounts(counts) === 0}
+      height={200}
+      table={{
+        columns: ["Status", "Payments", "Share"],
+        rows: rows.map((r) => [r.label, formatNumber(r.value), formatPercent((r.value / Math.max(sumCounts(counts), 1)) * 100)]),
+      }}
+    >
+      <DistributionBar
+        ariaLabel="Payments by status"
+        segments={PAYMENT_STATUSES.map((status) => ({
+          key: status,
+          label: PAYMENT_STATUS_META[status].label,
+          value: counts[status] ?? 0,
+          color: PAYMENT_STATUS_META[status].chart,
+        }))}
+      />
+    </ChartCard>
   );
 }
 
-export function PaymentsView() {
+export function PaymentsView({ focus }: { focus?: string }) {
   const list = useListState<Filters>(INITIAL, 20);
   const { filters, update } = list;
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(focus ?? null);
 
   const statistics = useApiQuery(["payments", "statistics"], paymentsApi.statistics);
   const q = useApiQuery(["payments", "list", list.params], () => paymentsApi.list(list.params));
@@ -118,6 +108,7 @@ export function PaymentsView() {
         />
       </StatGrid>
 
+      <FinanceTrends />
       <FinanceCharts />
 
       <ListCard title="Transactions" description="Newest first">

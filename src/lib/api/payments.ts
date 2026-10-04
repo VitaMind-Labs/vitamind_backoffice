@@ -5,7 +5,9 @@ import type {
   Payment,
   PaymentStatistics,
   PaymentStatus,
+  RevenueSeries,
   SortOrder,
+  SubscriptionOverview,
   SubscriptionPlan,
   SubscriptionPlanInput,
 } from "@/types/admin";
@@ -24,8 +26,9 @@ export interface PaymentFilters extends PageQuery {
 export const paymentsApi = {
   list: (filters: PaymentFilters) => api.get<Paginated<Payment>>("/payments", { ...filters }),
   statistics: () => api.get<PaymentStatistics>("/payments/statistics"),
+  revenue: (months = 12) => api.get<RevenueSeries>("/payments/revenue", { months }),
+  subscribers: () => api.get<SubscriptionOverview>("/payments/subscribers"),
   get: (id: string) => api.get<Payment>(`/payments/${id}`),
-  byUser: (userId: string, query: PageQuery) => api.get<Paginated<Payment>>(`/payments/user/${userId}`, { ...query }),
   /** SUPER_ADMIN only — exceptional manual correction. */
   updateStatus: (id: string, input: { status: PaymentStatus; reason: string }) =>
     api.patch<Payment>(`/payments/${id}/status`, input),
