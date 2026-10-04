@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/layout/admin-shell";
 
 export const metadata: Metadata = {
-  title: { default: "Back office", template: "%s · VitaMind back office" },
+  title: { default: "Admin", template: "%s · VitaMind Admin" },
   robots: { index: false, follow: false },
 };
 

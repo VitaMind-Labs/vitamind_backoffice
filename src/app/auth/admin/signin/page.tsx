@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { SignInFlow } from "@/components/admin/auth/sign-in-flow";
 
 export const metadata: Metadata = {
-  title: "Sign in · VitaMind back office",
+  title: "Sign in · VitaMind Admin",
   robots: { index: false, follow: false },
 };
 

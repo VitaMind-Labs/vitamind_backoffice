@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, ArrowLeft, ArrowRight, Eye, EyeOff, Info, Lock, Smartphone, TriangleAlert } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Eye, EyeOff, Info, Lock, ShieldCheck, Smartphone, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -135,7 +135,7 @@ export function SignInFlow() {
         <div className="w-full max-w-[380px] space-y-8">
           <div className="flex flex-col items-center gap-3 text-center">
             <AuthLogo />
-            <span className="text-sm font-semibold tracking-tight text-foreground">VitaMind Back office</span>
+            <span className="text-sm font-semibold tracking-tight text-foreground">VitaMind Admin</span>
           </div>
 
           <div className="space-y-6 rounded-2xl border bg-card p-6 shadow-sm sm:p-8">
@@ -277,11 +277,17 @@ export function SignInFlow() {
 
             {step === "setup" && (
               <>
-                <div className="space-y-1.5">
-                  <h1 className="text-2xl font-semibold tracking-tight">Set up two-factor authentication</h1>
-                  <p className="text-sm text-muted-foreground">
-                    Two-factor authentication is required for admin accounts. Enrol an authenticator app to continue.
-                  </p>
+                <div className="space-y-3">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-soft/70 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-primary">
+                    <ShieldCheck className="size-3.5" aria-hidden />
+                    Secure sign-in
+                  </span>
+                  <div className="space-y-1.5">
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground">Set up two-factor authentication</h1>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      Two-factor authentication is required for admin accounts. Enrol your authenticator app to keep access protected and auditable.
+                    </p>
+                  </div>
                 </div>
                 <TwoFactorSetup onComplete={finish} onCancel={backToCredentials} />
               </>

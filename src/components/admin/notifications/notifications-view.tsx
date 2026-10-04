@@ -334,7 +334,7 @@ export function NotificationsView() {
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}
         title="Delete this notification record?"
-        description="The log entry is removed from the back office. A message already delivered to its recipient cannot be recalled."
+        description="The log entry is removed from the admin console. A message already delivered to its recipient cannot be recalled."
         confirmLabel="Delete record"
         destructive
         isPending={remove.isPending}

@@ -10,7 +10,9 @@ import { API_BASE, withAdminToken } from "@/lib/auth/server-session";
 
 type Params = { params: Promise<{ path: string[] }> };
 
-const FORWARDED_RESPONSE_HEADERS = ["content-type", "content-disposition", "content-length"];
+// content-length / content-encoding are deliberately NOT forwarded: fetch() transparently
+// decompresses gzip/br bodies, so the upstream (compressed) length would truncate the JSON.
+const FORWARDED_RESPONSE_HEADERS = ["content-type", "content-disposition"];
 
 async function proxy(req: NextRequest, { params }: Params) {
   const { path } = await params;

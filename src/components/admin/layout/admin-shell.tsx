@@ -59,7 +59,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       }
       renderError={(message, retry) => (
         <FullScreenMessage>
-          <ErrorState error={new Error(message)} title="The back office couldn’t start" onRetry={retry} />
+          <ErrorState error={new Error(message)} title="The admin console couldn’t start" onRetry={retry} />
         </FullScreenMessage>
       )}
     >
