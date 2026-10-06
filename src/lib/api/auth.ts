@@ -11,6 +11,8 @@ export class AuthError extends Error {
   constructor(
     message: string,
     public readonly status: number,
+    /** Set by the password-reset routes: "invalid_link" means the link is unusable (expired, used, malformed). */
+    public readonly code?: string,
   ) {
     super(message);
   }
@@ -31,7 +33,8 @@ async function call<T>(action: string, init: { method?: "GET" | "POST"; body?: u
   }
   const payload = await res.json().catch(() => null);
   if (!res.ok) {
-    throw new AuthError((payload as { message?: string } | null)?.message ?? `Request failed (HTTP ${res.status}).`, res.status);
+    const failure = payload as { message?: string; code?: string } | null;
+    throw new AuthError(failure?.message ?? `Request failed (HTTP ${res.status}).`, res.status, failure?.code);
   }
   return payload as T;
 }
@@ -44,4 +47,8 @@ export const authApi = {
   refresh: () => call<LoginResult>("refresh", { body: {} }),
   logout: () => call<{ status: string }>("logout", { body: {} }),
   me: () => call<AdminProfile>("me", { method: "GET" }),
+  /** Always resolves the same way for any address: the backend never says whether the account exists. */
+  forgotPassword: (email: string) => call<{ status: string }>("forgot-password", { body: { email } }),
+  resetPassword: (token: string, password: string, confirmPassword: string) =>
+    call<{ status: string }>("reset-password", { body: { token, password, confirmPassword } }),
 };

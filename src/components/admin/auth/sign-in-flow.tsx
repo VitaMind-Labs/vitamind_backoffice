@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowLeft, ArrowRight, Eye, EyeOff, Info, Lock, ShieldCheck, Smartphone, TriangleAlert } from "lucide-react";
@@ -213,6 +214,11 @@ export function SignInFlow() {
                     Continue
                     {!pending && <ArrowRight className="transition-transform group-hover:translate-x-0.5" />}
                   </Button>
+                  <p className="text-center text-xs">
+                    <Link href="/forgot-password" className="font-medium text-primary underline-offset-4 hover:underline">
+                      Forgot your password?
+                    </Link>
+                  </p>
                 </form>
               </>
             )}

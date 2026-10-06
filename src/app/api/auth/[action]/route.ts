@@ -14,6 +14,7 @@ import {
   withAdminToken,
 } from "@/lib/auth/server-session";
 import { BACKEND_REFRESH_COOKIE, REFRESH_COOKIE } from "@/lib/auth/constants";
+import { callPasswordReset } from "@/lib/auth/password-reset.server";
 import type { TwoFactorEnrollment } from "@/types/admin";
 
 /**
@@ -25,6 +26,9 @@ import type { TwoFactorEnrollment } from "@/types/admin";
  *   POST /api/auth/2fa-confirm  { token }            (setup token or current session)
  *   POST /api/auth/refresh
  *   POST /api/auth/logout
+ *   POST /api/auth/forgot-password       { email }
+ *   POST /api/auth/verify-reset-token    { token }
+ *   POST /api/auth/reset-password        { token, password, confirmPassword }
  *   GET  /api/auth/me
  */
 
@@ -190,6 +194,23 @@ async function me() {
   return json(unwrap(payload));
 }
 
+/** Public password-reset steps: no session involved. `code` lets the page tell an unusable link from a typo. */
+async function passwordReset(action: "forgot-password" | "verify-reset-token" | "reset-password", req: NextRequest) {
+  const body = await readBody<{ email: string; token: string; password: string; confirmPassword: string }>(req);
+  const text = (value: unknown) => (typeof value === "string" ? value : "");
+  const outcome = await callPasswordReset(
+    action,
+    action === "forgot-password"
+      ? { email: text(body.email).trim() }
+      : action === "verify-reset-token"
+        ? { token: text(body.token) }
+        : { token: text(body.token), password: text(body.password), confirmPassword: text(body.confirmPassword) },
+  );
+  if (outcome.code === "ok") return json({ status: "ok" });
+  const status = { invalid_link: 400, validation: 400, rate_limited: 429, unavailable: 502 }[outcome.code];
+  return json({ message: outcome.message, code: outcome.code }, status);
+}
+
 async function handle(action: string, req: NextRequest) {
   try {
     switch (action) {
@@ -205,6 +226,10 @@ async function handle(action: string, req: NextRequest) {
         return await refresh();
       case "logout":
         return await logout();
+      case "forgot-password":
+      case "verify-reset-token":
+      case "reset-password":
+        return await passwordReset(action, req);
       default:
         return json({ message: "Not found" }, 404);
     }
