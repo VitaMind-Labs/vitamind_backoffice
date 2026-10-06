@@ -4,7 +4,6 @@ import { ADMIN_ENDPOINTS } from './config';
 import type { User, UserFilters, UpdateUserPayload } from '@/lib/types/models/user';
 import type { Session } from '@/lib/types/models/session';
 import type { UserResponse as UserResponseType } from '@/lib/types/models/response';
-import type { Payment } from '@/lib/types/models/payment';
 import type { PaginatedResult } from '@/lib/types/api';
 import { apiClient } from './api-client';
 import { safeAction } from './helpers';
@@ -19,7 +18,6 @@ function mapUser(raw: any): User {
     nickname: raw.nickname,
     email: raw.email,
     lang: raw.lang ?? raw.language,
-    subscription_tier: normalizeEnum(raw.subscription_tier ?? raw.subscriptionTier) as any,
     status: normalizeEnum(raw.status) as any,
     baseline_wpm: raw.baseline_wpm ?? raw.baselineWpm ?? null,
     baseline_backspace: raw.baseline_backspace ?? raw.baselineBackspace ?? null,
@@ -74,31 +72,6 @@ function mapPaginatedResponses(
   };
 }
 
-function mapPayment(raw: any): Payment {
-  return {
-    id: raw.id,
-    user_id: raw.user_id ?? raw.userId,
-    stripe_session_id: raw.stripe_session_id ?? raw.stripeSessionId ?? null,
-    stripe_intent_id: raw.stripe_intent_id ?? raw.stripePaymentId ?? null,
-    amount: Number(raw.amount),
-    currency: raw.currency,
-    status: normalizeEnum(raw.status) as any,
-    description: raw.description ?? null,
-    plan_id: raw.plan_id ?? null,
-    subscription_tier: normalizeEnum(raw.subscription_tier ?? raw.subscriptionTier) as any,
-    created_at: raw.created_at ?? raw.createdAt,
-    updated_at: raw.updated_at ?? raw.updatedAt,
-    user: raw.user,
-  };
-}
-
-function mapPaginatedPayments(raw: PaginatedResult<any>): PaginatedResult<Payment> {
-  return {
-    ...raw,
-    data: raw.data.map(mapPayment),
-  };
-}
-
 export async function getUsers(filters?: UserFilters) {
   return safeAction(() => {
     const params = new URLSearchParams();
@@ -148,15 +121,6 @@ export async function updateUserStatus(id: string, status: string) {
   });
 }
 
-export async function updateUserSubscription(id: string, tier: string) {
-  return safeAction(() => {
-    return apiClient<any>(`${ADMIN_ENDPOINTS.USERS}/${id}/subscription`, {
-      method: 'PATCH',
-      body: JSON.stringify({ tier }),
-    }).then(mapUser);
-  });
-}
-
 export async function getUserSessions(userId: string, page = 1, limit = 20) {
   return safeAction(() => {
     return apiClient<PaginatedResult<any>>(
@@ -187,14 +151,6 @@ export async function getUserResponses(userId: string, page = 1, limit = 20) {
     return apiClient<PaginatedResult<any>>(
       `${ADMIN_ENDPOINTS.USERS}/${userId}/responses?page=${page}&limit=${limit}`,
     ).then(mapPaginatedResponses);
-  });
-}
-
-export async function getUserPayments(userId: string, page = 1, limit = 20) {
-  return safeAction(() => {
-    return apiClient<PaginatedResult<any>>(
-      `${ADMIN_ENDPOINTS.USERS}/${userId}/payments?page=${page}&limit=${limit}`,
-    ).then(mapPaginatedPayments);
   });
 }
 

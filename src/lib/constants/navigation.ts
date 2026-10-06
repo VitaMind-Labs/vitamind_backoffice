@@ -2,7 +2,6 @@ import {
   Bell,
   BellRing,
   Building2,
-  CreditCard,
   Download,
   FileBadge,
   Gauge,
@@ -10,7 +9,6 @@ import {
   LayoutDashboard,
   CalendarClock,
   UserCog,
-  Package,
   ShieldAlert,
   Siren,
   Stethoscope,
@@ -38,7 +36,7 @@ export const NAVIGATION: NavGroup[] = [
   {
     label: "Overview",
     items: [
-      { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, permissions: ["dashboard.overview", "dashboard.payments"] },
+      { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, permissions: ["dashboard.overview"] },
       { label: "System health", href: "/admin/system", icon: HeartPulse, permissions: ["system.view"] },
     ],
   },
@@ -63,13 +61,6 @@ export const NAVIGATION: NavGroup[] = [
     ],
   },
   {
-    label: "Finance",
-    items: [
-      { label: "Payments", href: "/admin/payments", icon: CreditCard, permissions: ["payments.view"] },
-      { label: "Subscription Plans", href: "/admin/subscription-plans", icon: Package, permissions: ["plans.view"] },
-    ],
-  },
-  {
     label: "Operations",
     items: [
       { label: "Notifications", href: "/admin/notifications", icon: BellRing, permissions: ["notifications.view"] },
@@ -83,7 +74,7 @@ export const NAVIGATION: NavGroup[] = [
   {
     label: "Data",
     items: [
-      { label: "Exports", href: "/admin/exports", icon: Download, permissions: ["exports.users", "exports.payments", "exports.risks"] },
+      { label: "Exports", href: "/admin/exports", icon: Download, permissions: ["exports.users", "exports.risks"] },
     ],
   },
 ];
@@ -109,7 +100,6 @@ const TARGETS: Record<NotificationReferenceKind, (id: string) => NotificationTar
   PSYCHOLOGIST: (id) => ({ href: `/admin/psychologists?focus=${id}`, label: "Psychologists", permission: "psychologists.view" }),
   COVERAGE: () => ({ href: "/admin/coverage", label: "Coverage", permission: "coverage.view" }),
   LICENSE: (id) => ({ href: `/admin/licenses?focus=${id}`, label: "Licenses", permission: "licenses.manage" }),
-  PAYMENT: (id) => ({ href: `/admin/payments?focus=${id}`, label: "Payments", permission: "payments.view" }),
   PATIENT: (id) => ({ href: `/admin/users/${id}`, label: "Users", permission: "users.view" }),
 };
 

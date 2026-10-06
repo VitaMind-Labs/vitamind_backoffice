@@ -4,12 +4,6 @@ export enum Lang {
   EN = 'EN',
 }
 
-export enum SubscriptionTier {
-  Essential = 'Essential',
-  Premium = 'Premium',
-  Pro = 'Pro',
-}
-
 export enum UserStatus {
   Active = 'active',
   Inactive = 'inactive',

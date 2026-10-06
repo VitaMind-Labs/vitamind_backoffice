@@ -9,12 +9,6 @@ export type UserStatus = (typeof USER_STATUSES)[number];
 export const LANGUAGES = ["FR", "EN", "AR"] as const;
 export type Language = (typeof LANGUAGES)[number];
 
-export const SUBSCRIPTION_TIERS = ["BASIC", "PRO"] as const;
-export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[number];
-
-export const SUBSCRIPTION_STATUSES = ["TRIAL", "ACTIVE", "EXPIRED", "CANCELLED", "SUSPENDED"] as const;
-export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
-
 export const RISK_LEVELS = ["LOW", "MODERATE", "HIGH", "CRITICAL"] as const;
 export type RiskLevel = (typeof RISK_LEVELS)[number];
 
@@ -46,9 +40,6 @@ export type AlertResolution = (typeof ALERT_RESOLUTIONS)[number];
 
 export const DIAGNOSTIC_STATUSES = ["ACTIVE", "COMPLETED", "ABANDONED", "EXPIRED", "BLOCKED"] as const;
 export type DiagnosticStatus = (typeof DIAGNOSTIC_STATUSES)[number];
-
-export const PAYMENT_STATUSES = ["PENDING", "PAID", "FAILED", "REFUNDED", "FREE_TRIAL"] as const;
-export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
 export const NOTIFICATION_TYPES = [
   "PAYMENT",

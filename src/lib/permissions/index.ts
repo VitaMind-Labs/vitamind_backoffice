@@ -10,7 +10,6 @@ import type { AdminRole } from "@/types/admin";
 const PERMISSIONS = {
   // Dashboard
   "dashboard.overview": ["ADMIN"],
-  "dashboard.payments": ["ADMIN", "FINANCE"],
 
   // Users
   "users.list": ["ADMIN", "SUPPORT"],
@@ -18,8 +17,6 @@ const PERMISSIONS = {
   "users.update": ["ADMIN"],
   "users.delete": ["ADMIN"],
   "users.status": ["ADMIN", "SUPPORT"],
-  "users.subscription": ["FINANCE"],
-  "users.payments": ["ADMIN", "FINANCE"],
   "users.riskHistory": ["ADMIN"],
 
   // Clinical operations & telemetry
@@ -38,12 +35,6 @@ const PERMISSIONS = {
   "diagnostics.view": ["ADMIN"],
   "analytics.view": ["ADMIN"],
 
-  // Finance
-  "payments.view": ["ADMIN", "FINANCE"],
-  "payments.refund": ["ADMIN", "FINANCE"],
-  "payments.status": [],
-  "plans.view": ["ADMIN", "FINANCE"],
-  "plans.manage": ["ADMIN", "FINANCE"],
 
   // Operations
   "notifications.view": ["ADMIN"],
@@ -54,7 +45,6 @@ const PERMISSIONS = {
 
   // Data exports
   "exports.users": ["ADMIN"],
-  "exports.payments": ["ADMIN", "FINANCE"],
   "exports.risks": [],
 } as const satisfies Record<string, readonly AdminRole[]>;
 

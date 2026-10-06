@@ -8,7 +8,7 @@ import { Field, FormDialog } from "@/components/admin/shared/form-dialog";
 import { useApiMutation } from "@/hooks/admin/use-api-mutation";
 import { usersApi, type UserUpdateInput } from "@/lib/api/users";
 import { LANGUAGE_LABELS, USER_STATUS_META } from "@/lib/constants/status";
-import { LANGUAGES, SUBSCRIPTION_TIERS, USER_STATUSES, type AdminUser, type Language, type SubscriptionTier, type UserStatus } from "@/types/admin";
+import { LANGUAGES, USER_STATUSES, type AdminUser, type Language, type UserStatus } from "@/types/admin";
 
 const REASON_MAX = 300;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -136,62 +136,6 @@ export function UserEditDialog({
           </SelectContent>
         </Select>
       </Field>
-    </FormDialog>
-  );
-}
-
-/** PATCH /users/:id/subscription — FINANCE (and SUPER_ADMIN). Links the active plan of the tier. */
-export function SubscriptionTierDialog({
-  userId,
-  patientLabel,
-  currentTier,
-  open,
-  onOpenChange,
-}: {
-  userId: string;
-  patientLabel: string;
-  currentTier?: SubscriptionTier | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const [tier, setTier] = useState<SubscriptionTier>(currentTier === "PRO" ? "BASIC" : "PRO");
-  const [reason, setReason] = useState("");
-  const mutation = useApiMutation((input: { tier: SubscriptionTier; reason: string }) => usersApi.updateSubscription(userId, input), {
-    invalidate: ["users", "payments", "dashboard"],
-    successMessage: (r) => `Subscription moved to ${r.tier}`,
-    onSuccess: () => {
-      setReason("");
-      onOpenChange(false);
-    },
-  });
-  const valid = reason.trim().length > 0 && reason.length <= REASON_MAX && tier !== currentTier;
-
-  return (
-    <FormDialog
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Change subscription tier"
-      description={`${patientLabel} will be linked to the active plan of the selected tier. No payment is created or charged.`}
-      submitLabel="Change tier"
-      isPending={mutation.isPending}
-      canSubmit={valid}
-      onSubmit={() => void mutation.mutate({ tier, reason: reason.trim() })}
-    >
-      <Field label="Tier" htmlFor="tier" hint={currentTier ? `Current tier: ${currentTier}` : "No current plan"}>
-        <Select value={tier} onValueChange={(v) => setTier(v as SubscriptionTier)}>
-          <SelectTrigger id="tier">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SUBSCRIPTION_TIERS.map((t) => (
-              <SelectItem key={t} value={t} disabled={t === currentTier}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </Field>
-      <ReasonField value={reason} onChange={setReason} placeholder="e.g. Commercial gesture approved by finance lead" />
     </FormDialog>
   );
 }

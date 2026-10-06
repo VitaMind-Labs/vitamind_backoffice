@@ -1,6 +1,5 @@
 import {
   Lang,
-  SubscriptionTier,
   UserStatus,
   DetectedProfile,
   RiskLevel,
@@ -20,7 +19,6 @@ export interface User {
   nickname: string;
   email: string;
   lang: Lang;
-  subscription_tier: SubscriptionTier;
   status: UserStatus;
   baseline_wpm: number | null;
   baseline_backspace: number | null;
@@ -37,7 +35,6 @@ export interface UserSummary {
   nickname: string;
   email: string;
   lang: Lang;
-  subscription_tier: SubscriptionTier;
   status: UserStatus;
   detected_profile: DetectedProfile | null;
   risk_level: RiskLevel | null;
@@ -51,7 +48,6 @@ export interface UpdateUserPayload {
   email?: string;
   lang?: Lang;
   status?: UserStatus;
-  subscription_tier?: SubscriptionTier;
   risk_level?: RiskLevel;
   detected_profile?: DetectedProfile;
 }
@@ -59,7 +55,6 @@ export interface UpdateUserPayload {
 export interface UserFilters {
   status?: UserStatus;
   lang?: Lang;
-  tier?: SubscriptionTier;
   risk_level?: RiskLevel;
   detected_profile?: DetectedProfile;
   from?: string;

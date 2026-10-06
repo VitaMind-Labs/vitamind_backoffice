@@ -11,11 +11,8 @@ import type {
   LicenseAuthority,
   LicenseStatus,
   NotificationPriority,
-  PaymentStatus,
   PsychologistStatus,
   RiskLevel,
-  SubscriptionStatus,
-  SubscriptionTier,
   TriggerType,
   UserStatus,
 } from "@/types/admin";
@@ -44,14 +41,6 @@ export const USER_STATUS_META: Record<UserStatus, StatusMeta> = {
   BLOCKED: { label: "Blocked", tone: "danger" },
 };
 
-export const SUBSCRIPTION_STATUS_META: Record<SubscriptionStatus, StatusMeta> = {
-  TRIAL: { label: "Trial", tone: "info" },
-  ACTIVE: { label: "Active", tone: "success" },
-  EXPIRED: { label: "Expired", tone: "neutral" },
-  CANCELLED: { label: "Cancelled", tone: "neutral" },
-  SUSPENDED: { label: "Suspended", tone: "warning" },
-};
-
 export const CRISIS_STATUS_META: Record<CrisisStatus, StatusMeta> = {
   PENDING: { label: "Pending", tone: "warning" },
   IN_PROGRESS: { label: "In progress", tone: "info" },
@@ -74,14 +63,6 @@ export const DIAGNOSTIC_STATUS_META: Record<DiagnosticStatus, StatusMeta> = {
   ABANDONED: { label: "Abandoned", tone: "warning" },
   EXPIRED: { label: "Expired", tone: "neutral" },
   BLOCKED: { label: "Blocked", tone: "danger" },
-};
-
-export const PAYMENT_STATUS_META: Record<PaymentStatus, StatusMeta & { chart: string }> = {
-  PAID: { label: "Paid", tone: "success", chart: "var(--status-good)" },
-  PENDING: { label: "Pending", tone: "warning", chart: "var(--status-warning)" },
-  FAILED: { label: "Failed", tone: "danger", chart: "var(--status-critical)" },
-  REFUNDED: { label: "Refunded", tone: "neutral", chart: "var(--status-neutral)" },
-  FREE_TRIAL: { label: "Free trial", tone: "info", chart: "var(--chart-1)" },
 };
 
 export const PSYCHOLOGIST_STATUS_META: Record<PsychologistStatus, StatusMeta> = {
@@ -120,11 +101,6 @@ export const ALERT_RESOLUTION_META: Record<AlertResolution, StatusMeta> = {
   CONTACT_MADE: { label: "Contact made", tone: "success" },
   UNRESOLVED: { label: "Unresolved", tone: "warning" },
   FALSE_ALERT: { label: "False alert", tone: "neutral" },
-};
-
-export const SUBSCRIPTION_TIER_META: Record<SubscriptionTier, StatusMeta & { chart: string }> = {
-  BASIC: { label: "Basic", tone: "neutral", chart: "var(--chart-1)" },
-  PRO: { label: "Pro", tone: "brand", chart: "var(--chart-2)" },
 };
 
 export const CLINICIAN_ROLE_LABELS: Record<ClinicianRole, string> = {

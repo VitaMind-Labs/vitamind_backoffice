@@ -4,7 +4,6 @@ export * from './disease-type';
 export * from './questionnaire';
 export * from './question';
 export * from './response';
-export * from './payment';
 export * from './crisis';
 export * from './notification';
 export * from './audit';

@@ -10,7 +10,7 @@ The administration platform is designed for high-responsibility operational deci
 
 - Patient and clinical oversight
 - Crisis and alert triage
-- Subscription and billing visibility
+- Payment visibility
 - System health monitoring
 - Staff, clinic, and assignment management
 - Operational reporting and export workflows
@@ -23,7 +23,7 @@ It is built to help teams move quickly while keeping permissions, auditability, 
 - Crisis and clinical alert queue management
 - User and patient record monitoring
 - Diagnostic funnel and risk visibility
-- Payment and subscription review tools
+- Payment review tools
 - Notification and message routing
 - Clinic, psychologist, and assignment management
 - Coverage and staffing oversight

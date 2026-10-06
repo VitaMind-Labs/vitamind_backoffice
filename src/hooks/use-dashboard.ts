@@ -1,6 +1,6 @@
 import { useData } from './use-data';
-import { getDashboardStats, getDashboardKPIs, getRiskOverview, getUserActivity, getPaymentsDashboard, getQuestionnairesDashboard } from '@/actions/dashboard';
-import type { DashboardStats, KPIResult, RiskOverview, UserActivity, PaymentsDashboard, QuestionnaireDashboard } from '@/lib/types/api';
+import { getDashboardStats, getDashboardKPIs, getRiskOverview, getUserActivity, getQuestionnairesDashboard } from '@/actions/dashboard';
+import type { DashboardStats, KPIResult, RiskOverview, UserActivity, QuestionnaireDashboard } from '@/lib/types/api';
 
 export function useDashboardStats() {
   return useData<DashboardStats>(() => getDashboardStats(), []);
@@ -16,10 +16,6 @@ export function useRiskOverview() {
 
 export function useUserActivity() {
   return useData<UserActivity>(() => getUserActivity(), []);
-}
-
-export function usePaymentsDashboard() {
-  return useData<PaymentsDashboard>(() => getPaymentsDashboard(), []);
 }
 
 export function useQuestionnairesDashboard() {

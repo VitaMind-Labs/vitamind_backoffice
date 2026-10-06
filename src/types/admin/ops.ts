@@ -1,4 +1,4 @@
-import type { AlertType, ClinicianRole, LicenseAuthority, LicenseStatus, PsychologistStatus, RiskLevel, SubscriptionStatus, SubscriptionTier } from "./enums";
+import type { AlertType, ClinicianRole, LicenseAuthority, LicenseStatus, PsychologistStatus, RiskLevel } from "./enums";
 
 /* ---------------------------------------------------- Assignment circuit */
 
@@ -222,7 +222,7 @@ export interface EnginesStatus {
   status: "ok" | "degraded";
   expectedContracts: Record<string, string>;
   warnings: string[];
-  agents: Record<"mira" | "journal" | "checkin", EngineProbe>;
+  agents: Record<"mira" | "journal" | "checkin" | "spark", EngineProbe>;
   checkedAt: string;
 }
 
@@ -260,45 +260,3 @@ export interface AlertsSummary {
   perDay: Array<{ day: string; severity: RiskLevel; count: number }>;
 }
 
-/* ------------------------------------------------------------------ Finance */
-
-export interface RevenueMonth {
-  month: string;
-  paid: number;
-  refunded: number;
-  failed: number;
-  paidCount: number;
-  failedCount: number;
-  refundedCount: number;
-  net: number;
-}
-
-export interface RevenueSeries {
-  currency: string;
-  series: RevenueMonth[];
-  thisMonth: RevenueMonth;
-  monthOverMonthPct: number | null;
-}
-
-export interface SubscriptionOverview {
-  currency: string;
-  mrrEUR: number;
-  byStatus: Partial<Record<SubscriptionStatus, number>>;
-  byPlan: Array<{
-    planId: string;
-    tier: SubscriptionTier;
-    name: string;
-    isActive: boolean;
-    priceEUR: number;
-    durationDays: number;
-    active: number;
-    trial: number;
-    expired: number;
-    cancelled: number;
-    mrrEUR: number;
-  }>;
-  trialsEndingIn7d: number;
-  renewalsDueIn7d: number;
-  churnedLast30d: number;
-  withoutPlan: number;
-}

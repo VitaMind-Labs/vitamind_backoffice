@@ -40,7 +40,6 @@ export interface DashboardStats {
   activeUsers: number;
   todaySessions: number;
   todayCrises: number;
-  todayRevenue: number;
   totalCrises: number;
   criticalCrisesPending: number;
 }
@@ -66,23 +65,8 @@ export interface UserActivity {
   retentionRate: number;
 }
 
-export interface PaymentsDashboard {
-  mrr: number;
-  arr: number;
-  totalPaidTransactions: number;
-  usersByPlan: Array<{ subscription_tier: string; _count: number }>;
-}
-
 export interface QuestionnaireDashboard {
   totalResponses: number;
   averageScore: number | null;
   completionByQuestionnaire: Array<{ questionnaire_id: string; _count: number }>;
-}
-
-export interface StripePlan {
-  id: string;
-  name: string;
-  features: string[];
-  price: number;
-  currency: string;
 }

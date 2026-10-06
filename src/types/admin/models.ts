@@ -18,12 +18,9 @@ import type {
   LicenseStatus,
   NotificationPriority,
   NotificationType,
-  PaymentStatus,
   PsychologistStatus,
   AssignmentStatus,
   RiskLevel,
-  SubscriptionStatus,
-  SubscriptionTier,
   TriggerType,
   UserStatus,
 } from "./enums";
@@ -84,9 +81,6 @@ export interface AdminUser {
   nickname: string;
   email: string;
   language: Language;
-  subscriptionPlanId: string | null;
-  subscriptionPlan: { tier: SubscriptionTier; name: string } | null;
-  subscriptionStatus: SubscriptionStatus | null;
   status: UserStatus;
   detectedDisease: DiseaseType | null;
   riskLevel: RiskLevel | null;
@@ -290,7 +284,7 @@ export interface DiagnosticStats {
 export interface DiagnosticFunnel {
   range: DateRangeEcho;
   steps: Array<{
-    step: "started" | "completed" | "claimed" | "subscribed";
+    step: "started" | "completed" | "claimed";
     count: number;
     /** 0..1 */
     rateFromPrevious?: number;
@@ -305,7 +299,6 @@ export interface DashboardStats {
   activeUsers: number;
   todaySessions: number;
   todayCrises: number;
-  todayRevenue: DecimalValue;
   totalCrises: number;
   criticalCrisesPending: number;
 }
@@ -333,75 +326,6 @@ export interface DashboardUserActivity {
   retentionRate: number;
 }
 
-export interface DashboardPayments {
-  mrr: number;
-  arr: number;
-  totalPaidTransactions: number;
-  usersByPlan: Array<{ subscriptionPlanId: string | null; _count: number }>;
-}
-
-/* -------------------------------------------------------------- Payments */
-
-export interface Payment {
-  id: string;
-  userId: string;
-  planId: string | null;
-  stripePaymentIntentId: string | null;
-  stripeSessionId: string | null;
-  amount: DecimalValue;
-  currency: string;
-  status: PaymentStatus;
-  isTrial: boolean;
-  paymentMethod: string | null;
-  receiptUrl: string | null;
-  paidAt: string | null;
-  refundedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  user?: { id: string; patientNumber: number; nickname: string; email: string };
-}
-
-export interface PaymentStatistics {
-  totalRevenue: DecimalValue | null;
-  totalPayments: number;
-  paidCount: number;
-  /** 0..100 */
-  conversionRate: number;
-  byStatus: Array<{ status: PaymentStatus; _count: number }>;
-}
-
-export interface SubscriptionPlan {
-  id: string;
-  tier: SubscriptionTier;
-  name: string;
-  description: string | null;
-  priceEUR: DecimalValue;
-  durationDays: number;
-  trialDays: number;
-  reportsPerMonth: number;
-  hasAdvancedInsights: boolean;
-  hasUnlimitedJournal: boolean;
-  hasBehaviorAnalysis: boolean;
-  hasPrioritySupport: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface SubscriptionPlanInput {
-  tier: SubscriptionTier;
-  name: string;
-  priceEUR: number;
-  trialDays?: number;
-  durationDays?: number;
-  reportsPerMonth?: number;
-  hasAdvancedInsights?: boolean;
-  hasUnlimitedJournal?: boolean;
-  hasBehaviorAnalysis?: boolean;
-  hasPrioritySupport?: boolean;
-  isActive?: boolean;
-}
-
 /* --------------------------------------------------------- Notifications */
 
 export type NotificationReferenceKind =
@@ -411,7 +335,6 @@ export type NotificationReferenceKind =
   | "PSYCHOLOGIST"
   | "COVERAGE"
   | "LICENSE"
-  | "PAYMENT"
   | "PATIENT";
 
 /** The record a notification is about; `notificationTarget` maps it to the one page that owns that record. */
