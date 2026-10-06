@@ -222,7 +222,7 @@ export interface EnginesStatus {
   status: "ok" | "degraded";
   expectedContracts: Record<string, string>;
   warnings: string[];
-  agents: Record<"mira" | "journal" | "checkin", EngineProbe>;
+  agents: Record<"mira" | "journal" | "checkin" | "spark", EngineProbe>;
   checkedAt: string;
 }
 

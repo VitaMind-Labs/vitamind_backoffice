@@ -133,6 +133,7 @@ const LATENCY_SERIES = [
   { key: "mira", label: "Mira", color: CATEGORICAL[2] },
   { key: "journal", label: "Journal", color: CATEGORICAL[3] },
   { key: "checkin", label: "Check-in", color: CATEGORICAL[4] },
+  { key: "spark", label: "Spark", color: CATEGORICAL[5] },
 ] as const;
 
 /** Probe latency over the last hours, one line per component; a gap means the probe failed. */
@@ -144,6 +145,7 @@ export function LatencyChart({ samples }: { samples: HealthSample[] }) {
     mira: s.engines.mira?.up ? s.engines.mira.ms : null,
     journal: s.engines.journal?.up ? s.engines.journal.ms : null,
     checkin: s.engines.checkin?.up ? s.engines.checkin.ms : null,
+    spark: s.engines.spark?.up ? s.engines.spark.ms : null,
   }));
   return (
     <ResponsiveContainer width="100%" height="100%">

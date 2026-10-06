@@ -189,6 +189,7 @@ function OverviewTab({ health }: { health: SystemHealth }) {
           <UptimeStrip label="Mira" samples={samples} pick={(s) => s.engines.mira?.up ?? null} />
           <UptimeStrip label="Journal engine" samples={samples} pick={(s) => s.engines.journal?.up ?? null} />
           <UptimeStrip label="Check-in engine" samples={samples} pick={(s) => s.engines.checkin?.up ?? null} />
+          <UptimeStrip label="Spark engine" samples={samples} pick={(s) => s.engines.spark?.up ?? null} />
         </Card>
         <ChartCard
           title="Response time"
@@ -271,8 +272,8 @@ function OverviewTab({ health }: { health: SystemHealth }) {
   );
 }
 
-function EngineRow({ name, probe, expected, resetting, onReset }: { name: "mira" | "journal" | "checkin"; probe: EngineProbe; expected: string; resetting: boolean; onReset: () => void }) {
-  const labels = { mira: "Mira — orientation chat", journal: "Journal engine — entry analysis", checkin: "Check-in engine — daily validation" };
+function EngineRow({ name, probe, expected, resetting, onReset }: { name: "mira" | "journal" | "checkin" | "spark"; probe: EngineProbe; expected: string; resetting: boolean; onReset: () => void }) {
+  const labels = { mira: "Mira — orientation chat", journal: "Journal engine — entry analysis", checkin: "Check-in engine — daily validation", spark: "Spark engine — ADHD task planning" };
   const up = probe.health?.ok === true;
   const ready = probe.ready?.ok === true;
   const reported = (probe.version?.body?.contract_version as string | undefined) ?? null;
@@ -342,7 +343,7 @@ function EnginesTab() {
       {data?.warnings.map((w) => (
         <div key={w} className="rounded-lg border border-warning-border bg-warning-soft px-3 py-2 text-[13px]">{w}</div>
       ))}
-      {(["mira", "journal", "checkin"] as const).map((name) =>
+      {(["mira", "journal", "checkin", "spark"] as const).map((name) =>
         data ? (
           <EngineRow key={name} name={name} probe={data.agents[name]} expected={data.expectedContracts[name]} resetting={reset.isPending} onReset={() => void reset.mutate(name)} />
         ) : (
