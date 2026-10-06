@@ -8,7 +8,6 @@ import type {
   KPIResult,
   RiskOverview,
   UserActivity,
-  PaymentsDashboard,
   QuestionnaireDashboard,
 } from '@/lib/types/api';
 import { safeAction } from './helpers';
@@ -47,22 +46,6 @@ export async function getRiskOverview() {
 export async function getUserActivity() {
   return safeAction(() => {
     return apiClient<UserActivity>(ADMIN_ENDPOINTS.DASHBOARD_USER_ACTIVITY);
-  });
-}
-
-export async function getPaymentsDashboard() {
-  return safeAction(() => {
-    return apiClient<any>(ADMIN_ENDPOINTS.DASHBOARD_PAYMENTS).then((raw) => ({
-      mrr: raw.mrr ?? 0,
-      arr: raw.arr ?? 0,
-      totalPaidTransactions: raw.totalPaidTransactions ?? 0,
-      usersByPlan: (raw.usersByPlan ?? []).map((item: any) => ({
-        subscription_tier: normalizeEnum(
-          item.subscription_tier ?? item.subscriptionTier,
-        ),
-        _count: item._count,
-      })),
-    })) as Promise<PaymentsDashboard>;
   });
 }
 

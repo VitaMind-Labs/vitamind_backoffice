@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  ArrowLeftRight,
-  CreditCard,
   Minus,
   MoreHorizontal,
   PencilLine,
@@ -30,12 +28,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartCard } from "@/components/admin/charts/chart-card";
 import { RiskTrendChart } from "@/components/admin/charts/risk-trend-chart";
 import { ConfirmDialog } from "@/components/admin/shared/confirm-dialog";
-import { DataTable, Pagination } from "@/components/admin/shared/data-table";
 import { CopyableId, DetailRow, DetailSection, PrivacyNote } from "@/components/admin/shared/detail";
 import { ErrorState, PageSkeleton } from "@/components/admin/shared/states";
 import { MetricCard } from "@/components/admin/shared/stat-card";
 import { RiskBadge, StatusBadge } from "@/components/admin/shared/status-badge";
-import { PaymentDrawer, paymentColumns } from "@/components/admin/payments/payment-parts";
 import { useAdminSession } from "@/components/admin/providers/admin-session-provider";
 import { useApiMutation } from "@/hooks/admin/use-api-mutation";
 import { useApiQuery } from "@/hooks/admin/use-api-query";
@@ -44,13 +40,12 @@ import {
   DISEASE_LABELS,
   LANGUAGE_LABELS,
   RISK_META,
-  SUBSCRIPTION_STATUS_META,
   USER_STATUS_META,
 } from "@/lib/constants/status";
 import { formatDate, formatDateTime, formatNumber, formatRelative, patientRef } from "@/lib/formatters";
 import type { AdminUserDetail, RiskHistoryPoint } from "@/types/admin";
 import { cn } from "@/lib/utils";
-import { SubscriptionTierDialog, UserEditDialog, UserStatusDialog } from "./user-dialogs";
+import { UserEditDialog, UserStatusDialog } from "./user-dialogs";
 
 function OverviewTab({ user }: { user: AdminUserDetail }) {
   return (
@@ -70,12 +65,6 @@ function OverviewTab({ user }: { user: AdminUserDetail }) {
         </DetailRow>
       </DetailSection>
       <div className="space-y-5">
-        <DetailSection title="Subscription">
-          <DetailRow label="Plan">{user.subscriptionPlan ? `${user.subscriptionPlan.name} · ${user.subscriptionPlan.tier}` : "No plan"}</DetailRow>
-          <DetailRow label="Subscription status">
-            <StatusBadge value={user.subscriptionStatus} meta={SUBSCRIPTION_STATUS_META} />
-          </DetailRow>
-        </DetailSection>
         <DetailSection title="Clinical metadata">
           <DetailRow label="Latest risk level">
             <RiskBadge level={user.riskLevel} />
@@ -92,34 +81,6 @@ function OverviewTab({ user }: { user: AdminUserDetail }) {
         Mira transcripts, summaries, reports, journal content and clinician notes are never available in the admin platform.
       </PrivacyNote>
     </div>
-  );
-}
-
-function PaymentsTab({ userId }: { userId: string }) {
-  const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<string | null>(null);
-  const { can } = useAdminSession();
-  const q = useApiQuery(["users", "payments", userId, page], () => usersApi.payments(userId, { page, limit: 20 }), { keepPrevious: true });
-  return (
-    <>
-      <Card className="overflow-hidden">
-        <DataTable
-          columns={paymentColumns({ withPatient: false })}
-          rows={q.data?.data}
-          rowKey={(p) => p.id}
-          isLoading={q.isLoading}
-          isFetching={q.isFetching}
-          stale={q.isPlaceholder}
-          error={q.error}
-          onRetry={q.refetch}
-          onRowClick={can("payments.view") ? (p) => setSelected(p.id) : undefined}
-          activeRowKey={selected}
-          emptyTitle="No payments for this patient"
-        />
-        {q.data && <Pagination page={q.data.page} totalPages={q.data.totalPages} total={q.data.total} limit={q.data.limit} onPageChange={setPage} isFetching={q.isFetching} />}
-      </Card>
-      {can("payments.view") && <PaymentDrawer paymentId={selected} onClose={() => setSelected(null)} />}
-    </>
   );
 }
 
@@ -208,7 +169,7 @@ export function UserDetail({ userId }: { userId: string }) {
   const router = useRouter();
   const { can } = useAdminSession();
   const q = useApiQuery(["users", "detail", userId], () => usersApi.get(userId));
-  const [dialog, setDialog] = useState<"status" | "edit" | "delete" | "tier" | null>(null);
+  const [dialog, setDialog] = useState<"status" | "edit" | "delete" | null>(null);
   const remove = useApiMutation(() => usersApi.remove(userId), {
     invalidate: ["users", "dashboard"],
     successMessage: "Account deleted (soft delete)",
@@ -226,7 +187,7 @@ export function UserDetail({ userId }: { userId: string }) {
   if (!user) return <PageSkeleton />;
 
   const deleted = !!user.deletedAt;
-  const hasActions = can("users.status") || can("users.update") || can("users.delete") || can("users.subscription");
+  const hasActions = can("users.status") || can("users.update") || can("users.delete");
 
   return (
     <div className="space-y-6">
@@ -254,7 +215,6 @@ export function UserDetail({ userId }: { userId: string }) {
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
                   <StatusBadge value={user.status} meta={USER_STATUS_META} />
                   <RiskBadge level={user.riskLevel} />
-                  {user.subscriptionPlan && <Badge tone="brand">{user.subscriptionPlan.tier}</Badge>}
                   {deleted && <Badge tone="danger">Deleted {formatDate(user.deletedAt)}</Badge>}
                 </div>
               </div>
@@ -266,7 +226,7 @@ export function UserDetail({ userId }: { userId: string }) {
                     <ShieldBan /> Change status
                   </Button>
                 )}
-                {(can("users.update") || can("users.delete") || can("users.subscription")) && (
+                {(can("users.update") || can("users.delete")) && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="icon-sm" aria-label="More actions">
@@ -277,11 +237,6 @@ export function UserDetail({ userId }: { userId: string }) {
                       {can("users.update") && (
                         <DropdownMenuItem onSelect={() => setDialog("edit")}>
                           <PencilLine /> Edit account details
-                        </DropdownMenuItem>
-                      )}
-                      {can("users.subscription") && (
-                        <DropdownMenuItem onSelect={() => setDialog("tier")}>
-                          <ArrowLeftRight /> Change subscription tier
                         </DropdownMenuItem>
                       )}
                       {can("users.delete") && (
@@ -299,7 +254,7 @@ export function UserDetail({ userId }: { userId: string }) {
             )}
           </div>
         </div>
-        <dl className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 xl:grid-cols-6">
+        <dl className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 xl:grid-cols-5">
           {[
             { label: "Risk level", value: <RiskBadge level={user.riskLevel} /> },
             {
@@ -307,10 +262,6 @@ export function UserDetail({ userId }: { userId: string }) {
               value: <span className={cn("tabular-nums", user.crisisCount > 0 && "text-serious")}>{formatNumber(user.crisisCount)}</span>,
             },
             { label: "Orientation", value: user.detectedDisease ? DISEASE_LABELS[user.detectedDisease] : "Not determined" },
-            {
-              label: "Plan",
-              value: user.subscriptionPlan ? user.subscriptionPlan.name : <span className="text-muted-foreground">No plan</span>,
-            },
             { label: "Last active", value: user.lastActiveAt ? formatRelative(user.lastActiveAt) : "Never" },
             { label: "Language", value: LANGUAGE_LABELS[user.language] ?? user.language },
           ].map((fact) => (
@@ -327,11 +278,6 @@ export function UserDetail({ userId }: { userId: string }) {
           <TabsTrigger value="overview">
             <UserRound /> Overview
           </TabsTrigger>
-          {can("users.payments") && (
-            <TabsTrigger value="payments">
-              <CreditCard /> Payments
-            </TabsTrigger>
-          )}
           {can("users.riskHistory") && (
             <TabsTrigger value="risk">
               <TrendingUp /> Risk history
@@ -341,11 +287,6 @@ export function UserDetail({ userId }: { userId: string }) {
         <TabsContent value="overview">
           <OverviewTab user={user} />
         </TabsContent>
-        {can("users.payments") && (
-          <TabsContent value="payments">
-            <PaymentsTab userId={user.id} />
-          </TabsContent>
-        )}
         {can("users.riskHistory") && (
           <TabsContent value="risk">
             <RiskHistoryPanel userId={user.id} />
@@ -355,15 +296,6 @@ export function UserDetail({ userId }: { userId: string }) {
 
       {dialog === "status" && <UserStatusDialog user={user} open onOpenChange={(o) => !o && setDialog(null)} />}
       {dialog === "edit" && <UserEditDialog user={user} open onOpenChange={(o) => !o && setDialog(null)} />}
-      {dialog === "tier" && (
-        <SubscriptionTierDialog
-          open
-          onOpenChange={(o) => !o && setDialog(null)}
-          userId={user.id}
-          patientLabel={patientRef(user.patientNumber)}
-          currentTier={user.subscriptionPlan?.tier}
-        />
-      )}
       <ConfirmDialog
         open={dialog === "delete"}
         onOpenChange={(o) => !o && setDialog(null)}

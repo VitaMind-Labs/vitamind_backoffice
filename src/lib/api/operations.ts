@@ -11,7 +11,6 @@ import type {
   NotificationType,
   PageQuery,
   Paginated,
-  PaymentStatus,
   UserStatus,
 } from "@/types/admin";
 
@@ -55,6 +54,5 @@ export interface ExportQuery {
 
 export const exportsApi = {
   users: (query: ExportQuery & { status?: UserStatus }) => apiDownload("/export/users", { ...query }),
-  payments: (query: ExportQuery & { status?: PaymentStatus }) => apiDownload("/export/payments", { ...query }),
   risks: (query: ExportQuery) => apiDownload("/export/risks", { ...query }),
 };

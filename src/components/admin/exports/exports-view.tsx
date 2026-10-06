@@ -13,9 +13,9 @@ import { PageHeader } from "@/components/admin/shared/page-header";
 import { Can } from "@/components/admin/shared/permission";
 import { useApiMutation } from "@/hooks/admin/use-api-mutation";
 import { exportsApi, type ExportQuery } from "@/lib/api/operations";
-import { PAYMENT_STATUS_META, USER_STATUS_META } from "@/lib/constants/status";
+import { USER_STATUS_META } from "@/lib/constants/status";
 import { formatBytes } from "@/lib/formatters";
-import { PAYMENT_STATUSES, USER_STATUSES, type PaymentStatus, type UserStatus } from "@/types/admin";
+import { USER_STATUSES, type UserStatus } from "@/types/admin";
 
 const REASON_MAX = 300;
 const ALL = "__all";
@@ -159,13 +159,12 @@ function ExportsBody() {
         <Can permission="exports.users">
           <ExportCard
             title="Users"
-            description="Patient accounts with their subscription and clinical metadata."
+            description="Patient accounts with their clinical metadata."
             icon={Users}
             resource="users"
             includes={[
               "Patient reference, nickname, email, language",
               "Account status and detected orientation",
-              "Subscription plan, tier and status",
               "Crisis count, last activity, sign-up date",
             ]}
             statusOptions={optionsFrom(USER_STATUSES, USER_STATUS_META)}
@@ -173,22 +172,6 @@ function ExportsBody() {
           />
         </Can>
 
-        <Can permission="exports.payments">
-          <ExportCard
-            title="Payments"
-            description="Transactions with amounts, statuses and provider references."
-            icon={FileSpreadsheet}
-            resource="payments"
-            includes={[
-              "Amount, currency, status and trial flag",
-              "Payment method and plan identifier",
-              "Provider intent and session identifiers",
-              "Created, paid and refunded timestamps",
-            ]}
-            statusOptions={optionsFrom(PAYMENT_STATUSES, PAYMENT_STATUS_META)}
-            run={(query) => exportsApi.payments({ ...query, status: query.status as PaymentStatus | undefined })}
-          />
-        </Can>
 
         <Can permission="exports.risks">
           <ExportCard

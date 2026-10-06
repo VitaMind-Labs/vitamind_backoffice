@@ -8,7 +8,7 @@ import { useUsers } from "@/hooks/use-users";
 import { useResponses } from "@/hooks/use-responses";
 import { useNotifications } from "@/hooks/use-notifications";
 import { formatDate } from "@/lib/utils";
-import { Users, ClipboardList, FileText, ShieldAlert, CreditCard, Activity, TrendingUp, Bell, AlertTriangle } from "lucide-react";
+import { Users, ClipboardList, FileText, ShieldAlert, Activity, TrendingUp, Bell, AlertTriangle } from "lucide-react";
 
 const riskLabels: Record<string, string> = {
   low: "text-gray-500", moderate: "text-gray-700", high: "font-semibold text-black", critical: "font-bold text-red-600",
@@ -94,7 +94,6 @@ export function DashboardPage() {
           <StatCard title="Sessions Today" value={s?.todaySessions ?? 0} icon={ClipboardList} subtitle="Last 24h" />
           <StatCard title="Daily Crises" value={s?.todayCrises ?? 0} icon={ShieldAlert} subtitle="Today" />
           <StatCard title="Critical Pending" value={s?.criticalCrisesPending ?? 0} icon={AlertTriangle} subtitle="Needs attention" />
-          <StatCard title="Revenue Today" value={s?.todayRevenue ? `€${s.todayRevenue}` : "€0"} icon={CreditCard} subtitle="Last 24h" />
           <StatCard title="Total Crises" value={s?.totalCrises ?? 0} icon={AlertTriangle} subtitle="All time" />
           <StatCard title="Unread Alerts" value={notifications.data?.total ?? 0} icon={Bell} subtitle="Notifications" />
         </div>

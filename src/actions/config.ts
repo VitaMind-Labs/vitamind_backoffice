@@ -20,12 +20,10 @@ export const ADMIN_ENDPOINTS = {
   QUESTIONS: '/admin/questions',
   CRISIS_EVENTS: '/admin/crisis-events',
   RISK_DETECTIONS: '/admin/risk-detections',
-  PAYMENTS: '/admin/payments',
   NOTIFICATIONS: '/admin/notifications',
   DASHBOARD_STATS: '/admin/dashboard/stats',
   DASHBOARD_KPIS: '/admin/dashboard/kpis',
   DASHBOARD_RISK_OVERVIEW: '/admin/dashboard/risk-overview',
   DASHBOARD_USER_ACTIVITY: '/admin/dashboard/user-activity',
-  DASHBOARD_PAYMENTS: '/admin/dashboard/payments',
   DASHBOARD_QUESTIONNAIRES: '/admin/dashboard/questionnaires',
 } as const;

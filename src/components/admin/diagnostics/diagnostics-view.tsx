@@ -50,7 +50,6 @@ const FUNNEL_LABELS: Record<string, string> = {
   started: "Started",
   completed: "Completed",
   claimed: "Claimed by a clinician",
-  subscribed: "Subscribed",
 };
 
 function diagnosticColumns(): Column<DiagnosticSession>[] {
@@ -234,7 +233,7 @@ function AnalyticsSection({ range }: { range: DateRangeValue }) {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <ChartCard
           title="Diagnostic funnel"
-          description="Started → completed → claimed → subscribed"
+          description="Started → completed → claimed"
           isLoading={funnel.isLoading}
           isEmpty={(funnel.data?.steps[0]?.count ?? 0) === 0}
           emptyLabel="No diagnostic activity in this period"

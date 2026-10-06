@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Download } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable, Pagination, type Column } from "@/components/admin/shared/data-table";
 import {
@@ -28,13 +27,11 @@ import {
   DISEASE_TYPES,
   LANGUAGES,
   RISK_LEVELS,
-  SUBSCRIPTION_TIERS,
   USER_STATUSES,
   type AdminUser,
   type DiseaseType,
   type Language,
   type RiskLevel,
-  type SubscriptionTier,
   type UserStatus,
 } from "@/types/admin";
 
@@ -47,7 +44,6 @@ const URL_KEYS = [
   "status",
   "risk_level",
   "detected_disease",
-  "tier",
   "lang",
   "last_active_days",
   "min_crises",
@@ -85,12 +81,6 @@ const columns: Column<AdminUser>[] = [
     header: "Orientation",
     hideBelow: "lg",
     cell: (u) => <span className="text-muted-foreground">{u.detectedDisease ? DISEASE_LABELS[u.detectedDisease] : "—"}</span>,
-  },
-  {
-    id: "tier",
-    header: "Plan",
-    hideBelow: "md",
-    cell: (u) => (u.subscriptionPlan ? <Badge tone="brand">{u.subscriptionPlan.tier}</Badge> : <span className="text-muted-foreground">None</span>),
   },
   { id: "lang", header: "Language", hideBelow: "xl", cell: (u) => LANGUAGE_LABELS[u.language] ?? u.language },
   {
@@ -147,7 +137,6 @@ export function UsersList() {
           <SelectFilter label="Status" value={filters.status} options={optionsFrom(USER_STATUSES, USER_STATUS_META)} onChange={(v) => update({ status: v as UserStatus })} />
           <SelectFilter label="Risk" value={filters.risk_level} options={optionsFrom(RISK_LEVELS, RISK_META)} onChange={(v) => update({ risk_level: v as RiskLevel })} />
           <SelectFilter label="Orientation" value={filters.detected_disease} options={optionsFrom(DISEASE_TYPES, DISEASE_LABELS)} onChange={(v) => update({ detected_disease: v as DiseaseType })} />
-          <SelectFilter label="Plan" value={filters.tier} options={optionsFrom(SUBSCRIPTION_TIERS)} onChange={(v) => update({ tier: v as SubscriptionTier })} />
           <SelectFilter label="Language" value={filters.lang} options={optionsFrom(LANGUAGES, LANGUAGE_LABELS)} onChange={(v) => update({ lang: v as Language })} />
           <SelectFilter
             label="Active"

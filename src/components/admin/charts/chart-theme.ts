@@ -2,7 +2,7 @@
  * Chart design constants. Colours reference the CSS tokens in globals.css so
  * every chart shares one palette:
  *  - CATEGORICAL: identity (fixed order, never cycled, max 8)
- *  - status tokens: meaning (good / warning / serious / critical) via RISK_META & PAYMENT_STATUS_META
+ *  - status tokens: meaning (good / warning / serious / critical) via RISK_META
  *  - ORDINAL: ordered stages (funnels)
  */
 export const CATEGORICAL = [

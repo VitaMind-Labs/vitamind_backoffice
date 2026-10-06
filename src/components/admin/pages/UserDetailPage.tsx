@@ -58,7 +58,6 @@ export function UserDetailPage() {
                 user.risk_level === "critical" ? "bg-red-50 text-red-700" :
                 user.risk_level === "high" ? "bg-gray-100 text-black" : "bg-gray-50 text-gray-600"
               }`}>{user.risk_level ?? "—"}</span>
-              <span className="rounded border border-gray-200 px-2 py-0.5 text-xs text-gray-600">{user.subscription_tier}</span>
             </div>
           </div>
         </div>

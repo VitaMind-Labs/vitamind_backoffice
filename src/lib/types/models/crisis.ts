@@ -57,5 +57,4 @@ export interface FalsePositivesResult {
 export interface StateDistributionResult {
   byState: Array<{ state_detected: string | null; _count: number }>;
   byLanguage: Array<{ lang: string; _count: number }>;
-  byTier: Array<{ subscription_tier: string; _count: number }>;
 }

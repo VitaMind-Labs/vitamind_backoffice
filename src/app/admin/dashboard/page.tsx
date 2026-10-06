@@ -5,7 +5,7 @@ import { RequirePermission } from "@/components/admin/shared/permission";
 
 export default function DashboardPage() {
   return (
-    <RequirePermission permission={["dashboard.overview", "dashboard.payments"]}>
+    <RequirePermission permission="dashboard.overview">
       <DashboardView />
     </RequirePermission>
   );

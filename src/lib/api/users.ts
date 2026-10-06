@@ -6,18 +6,15 @@ import type {
   Language,
   PageQuery,
   Paginated,
-  Payment,
   RiskHistoryPoint,
   RiskLevel,
   SortOrder,
-  SubscriptionTier,
   UserStatus,
 } from "@/types/admin";
 
 export interface UserFilters extends PageQuery {
   status?: UserStatus;
   lang?: Language;
-  tier?: SubscriptionTier;
   risk_level?: RiskLevel;
   detected_disease?: DiseaseType;
   from?: string;
@@ -43,8 +40,5 @@ export const usersApi = {
   remove: (id: string) => api.delete<{ id: string; deletedAt: string }>(`/users/${id}`),
   updateStatus: (id: string, input: { status: UserStatus; reason: string }) =>
     api.patch<{ id: string; status: UserStatus }>(`/users/${id}/status`, input),
-  updateSubscription: (id: string, input: { tier: SubscriptionTier; reason: string }) =>
-    api.patch<{ id: string; subscriptionPlanId: string; tier: SubscriptionTier }>(`/users/${id}/subscription`, input),
-  payments: (id: string, query: PageQuery) => api.get<Paginated<Payment>>(`/users/${id}/payments`, { ...query }),
   riskHistory: (id: string) => api.get<RiskHistoryPoint[]>(`/users/${id}/risk-history`),
 };

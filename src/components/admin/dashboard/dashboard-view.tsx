@@ -25,7 +25,6 @@ import { diagnosticsApi } from "@/lib/api/diagnostics";
 import { DISEASE_LABELS, RISK_META } from "@/lib/constants/status";
 import {
   formatCompact,
-  formatMoney,
   formatNumber,
   formatPercent,
   formatRatio,
@@ -117,7 +116,6 @@ function OverviewSection({ range }: { range: DateRangeValue }) {
           value={k ? `${formatNumber(k.avgSlaMinutes, 1)} min` : "—"}
           hint={k ? (k.slaMet ? `Within ${k.slaTarget} min SLA` : `Above ${k.slaTarget} min SLA`) : undefined}
         />
-        <MetricCard label="Revenue today" value={formatMoney(s?.todayRevenue)} hint="Paid payments only" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -155,33 +153,6 @@ function OverviewSection({ range }: { range: DateRangeValue }) {
   );
 }
 
-function FinanceSection() {
-  const pay = useApiQuery(["dashboard", "payments"], dashboardApi.payments);
-  return (
-    <div className="space-y-4">
-      <SectionHeader title="Revenue" description="Paid payments only. Transactions, outcomes and subscribers are on the Payments page." />
-      <StatGrid>
-        <StatCard
-          label="Revenue this month"
-          icon={CircleDollarSign}
-          href="/admin/payments"
-          loading={pay.isLoading}
-          value={formatMoney(pay.data?.mrr)}
-          hint="Paid since the 1st of the month"
-        />
-        <StatCard label="Annualised run rate" href="/admin/payments" loading={pay.isLoading} value={formatMoney(pay.data?.arr)} hint="This month × 12" />
-        <StatCard
-          label="Paid transactions"
-          href="/admin/payments"
-          loading={pay.isLoading}
-          value={formatNumber(pay.data?.totalPaidTransactions)}
-          hint="All time"
-        />
-      </StatGrid>
-    </div>
-  );
-}
-
 const AUTO_REFRESH_MS = 60_000;
 const AUTO_KEY = "vm-dashboard-auto-refresh";
 
@@ -203,11 +174,10 @@ export function DashboardView() {
     }
   });
   const showOverview = can("dashboard.overview");
-  const showFinance = can("dashboard.payments");
 
   const refresh = useCallback((quiet = false) => {
     if (!quiet) setRefreshing(true);
-    invalidateQueries("dashboard", "diagnostics", "crisis-events", "clinical-alerts", "users", "payments", "plans");
+    invalidateQueries("dashboard", "diagnostics", "crisis-events", "clinical-alerts", "users");
     setUpdatedAt(new Date());
     if (!quiet) setTimeout(() => setRefreshing(false), 600);
   }, []);
@@ -232,14 +202,12 @@ export function DashboardView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={showOverview ? "Operations overview" : "Finance overview"}
+        title="Operations overview"
         description={
           <>
             {greeting(updatedAt)}
             {admin.firstName ? `, ${admin.firstName}` : ""}.{" "}
-            {showOverview
-              ? "Patient safety, engagement and diagnostics at a glance."
-              : "Revenue and subscription health from recorded payments."}
+            Patient safety, engagement and diagnostics at a glance.
           </>
         }
         meta={
@@ -265,11 +233,6 @@ export function DashboardView() {
       />
       {showOverview && <AttentionBanner />}
       {showOverview && <OverviewSection range={range} />}
-      {showFinance && (
-        <div className={showOverview ? "border-t pt-8" : undefined}>
-          <FinanceSection />
-        </div>
-      )}
     </div>
   );
 }
