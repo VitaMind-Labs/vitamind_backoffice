@@ -3,7 +3,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 
 const dictionary = {
-  brand: "VitaMind",
+  brand: "SynQ",
   auth: {
     badge: "Mental Wellness",
     helperTitle: "Your Well-being Journey",

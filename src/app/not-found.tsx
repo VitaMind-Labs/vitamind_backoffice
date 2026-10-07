@@ -43,7 +43,7 @@ export default function NotFound() {
         <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl border bg-card/80 shadow-lg backdrop-blur-md">
           <Image
             src="/logo.svg"
-            alt="VitaMind"
+            alt="SynQ"
             width={72}
             height={72}
             className="h-[72px] w-[72px] bg-transparent object-contain"

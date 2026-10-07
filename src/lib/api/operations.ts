@@ -34,7 +34,8 @@ export const notificationsApi = {
 export const clinicsApi = {
   list: () => api.get<Clinic[]>("/clinics"),
   get: (id: string) => api.get<Clinic>(`/clinics/${id}`),
-  create: (input: ClinicInput) => api.post<Clinic>("/clinics", input),
+  /** The creation answer has no member list yet (a new clinic has none); the detail call returns it. */
+  create: (input: ClinicInput) => api.post<Omit<Clinic, "members">>("/clinics", input),
   update: (id: string, input: Partial<ClinicInput>) => api.patch<Clinic>(`/clinics/${id}`, input),
   remove: (id: string) => api.delete<{ message: string }>(`/clinics/${id}`),
 };

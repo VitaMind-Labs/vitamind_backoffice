@@ -6,7 +6,8 @@ export type AdminRole = (typeof ADMIN_ROLES)[number];
 export const USER_STATUSES = ["ACTIVE", "INACTIVE", "SUSPENDED", "BLOCKED"] as const;
 export type UserStatus = (typeof USER_STATUSES)[number];
 
-export const LANGUAGES = ["FR", "EN", "AR"] as const;
+// The platform speaks English and Arabic: the API rejects any other language (400).
+export const LANGUAGES = ["EN", "AR"] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 export const RISK_LEVELS = ["LOW", "MODERATE", "HIGH", "CRITICAL"] as const;
@@ -18,7 +19,7 @@ export type DiseaseType = (typeof DISEASE_TYPES)[number];
 export const CRISIS_STATUSES = ["PENDING", "IN_PROGRESS", "RESOLVED", "ESCALATED", "FALSE_ALERT"] as const;
 export type CrisisStatus = (typeof CRISIS_STATUSES)[number];
 
-export const TRIGGER_TYPES = ["NLP", "JOURNAL", "DIAGNOSTIC", "BIOMETRICS", "MANUAL"] as const;
+export const TRIGGER_TYPES = ["NLP", "JOURNAL", "SPARK", "DIAGNOSTIC", "BIOMETRICS", "MANUAL"] as const;
 export type TriggerType = (typeof TRIGGER_TYPES)[number];
 
 export const ALERT_TYPES = [

@@ -81,6 +81,7 @@ export const NOTIFICATION_PRIORITY_META: Record<NotificationPriority, StatusMeta
 export const TRIGGER_META: Record<TriggerType, StatusMeta> = {
   NLP: { label: "NLP", tone: "info" },
   JOURNAL: { label: "Journal", tone: "info" },
+  SPARK: { label: "Spark", tone: "info" },
   DIAGNOSTIC: { label: "Diagnostic", tone: "info" },
   BIOMETRICS: { label: "Biometrics", tone: "info" },
   MANUAL: { label: "Manual", tone: "neutral" },

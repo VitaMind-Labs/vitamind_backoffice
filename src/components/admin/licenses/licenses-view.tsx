@@ -260,7 +260,7 @@ export function LicensesView({ focus }: { focus?: string }) {
             <li>· A verified licence lets the clinician receive routed clinical alerts and take crisis coverage.</li>
             <li>· A rejection is final for that submission — submit a new verification once new evidence is available.</li>
           </ul>
-          <PrivacyNote>Clinician identity documents and register screenshots are not stored in VitaMind and cannot be attached here.</PrivacyNote>
+          <PrivacyNote>Clinician identity documents and register screenshots are not stored in SynQ and cannot be attached here.</PrivacyNote>
         </div>
       </Card>
 

@@ -59,7 +59,7 @@ export function UserFormPage() {
 
       {!isEdit && (
         <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-6 text-center">
-          <p className="text-sm text-gray-500">New users register through the VitaMind frontend application.</p>
+          <p className="text-sm text-gray-500">New users register through the SynQ frontend application.</p>
           <button onClick={() => router.push(`/${sessionId}?page=users`)} className="mt-4 rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800">
             Back to Users
           </button>

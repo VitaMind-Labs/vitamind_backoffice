@@ -38,7 +38,7 @@ const json = (body: unknown, status = 200) =>
   NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
 function unreachable() {
-  return json({ message: `Cannot reach the VitaMind API at ${API_BASE}.` }, 502);
+  return json({ message: `Cannot reach the SynQ API at ${API_BASE}.` }, 502);
 }
 
 async function backend(path: string, init: RequestInit = {}) {

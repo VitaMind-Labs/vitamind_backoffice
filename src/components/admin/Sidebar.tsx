@@ -53,17 +53,18 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       className="fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-200"
     >
       <div className="flex h-14 items-center justify-between border-b border-gray-200 px-4">
-        <Link href={`/${sessionId}`} className="flex items-center justify-center gap-2 overflow-hidden" aria-label="VitaMind">
+        <Link href={`/${sessionId}`} className="flex items-center justify-center gap-2 overflow-hidden" aria-label="SynQ">
           <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent">
             <Image
               src="/logo.svg"
-              alt="VitaMind"
+              alt=""
               width={44}
               height={44}
               className="h-11 w-11 shrink-0 bg-transparent object-contain"
               priority
             />
           </div>
+          {!collapsed && <span className="shrink-0 text-sm font-semibold text-gray-900">SynQ</span>}
         </Link>
         <button
           onClick={onToggle}

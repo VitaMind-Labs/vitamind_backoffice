@@ -136,7 +136,7 @@ export function SignInFlow() {
         <div className="w-full max-w-[380px] space-y-8">
           <div className="flex flex-col items-center gap-3 text-center">
             <AuthLogo />
-            <span className="text-sm font-semibold tracking-tight text-foreground">VitaMind Admin</span>
+            <span className="text-sm font-semibold tracking-tight text-foreground">SynQ Admin</span>
           </div>
 
           <div className="space-y-6 rounded-2xl border bg-card p-6 shadow-sm sm:p-8">
@@ -146,7 +146,7 @@ export function SignInFlow() {
               <>
                 <div className="space-y-1.5">
                   <h1 className="text-xl font-semibold tracking-tight">Sign in</h1>
-                  <p className="text-sm text-muted-foreground">Use your VitaMind admin account.</p>
+                  <p className="text-sm text-muted-foreground">Use your SynQ admin account.</p>
                 </div>
                 {reason && !error && <Alert tone={reason.tone}>{reason.text}</Alert>}
                 {error && <Alert tone="error">{error}</Alert>}

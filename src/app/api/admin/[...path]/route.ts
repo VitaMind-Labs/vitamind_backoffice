@@ -44,7 +44,7 @@ async function proxy(req: NextRequest, { params }: Params) {
     );
   } catch {
     return NextResponse.json(
-      { success: false, statusCode: 502, message: `Cannot reach the VitaMind API at ${API_BASE}.` },
+      { success: false, statusCode: 502, message: `Cannot reach the SynQ API at ${API_BASE}.` },
       { status: 502 },
     );
   }

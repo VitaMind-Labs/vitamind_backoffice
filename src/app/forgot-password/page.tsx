@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ForgotPasswordFlow } from "@/components/admin/auth/password-reset-flow";
 
 export const metadata: Metadata = {
-  title: "Forgot password · VitaMind Admin",
+  title: "Forgot password · SynQ Admin",
   robots: { index: false, follow: false },
 };
 
