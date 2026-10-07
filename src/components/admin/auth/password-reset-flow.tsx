@@ -37,7 +37,7 @@ function Shell({ children }: { children: ReactNode }) {
         <div className="w-full max-w-[380px] space-y-8">
           <div className="flex flex-col items-center gap-3 text-center">
             <AuthLogo />
-            <span className="text-sm font-semibold tracking-tight text-foreground">VitaMind Admin</span>
+            <span className="text-sm font-semibold tracking-tight text-foreground">SynQ Admin</span>
           </div>
           <div className="space-y-6 rounded-2xl border bg-card p-6 shadow-sm sm:p-8">{children}</div>
           <p className="flex items-center justify-center gap-1.5 text-xs text-subtle-foreground">

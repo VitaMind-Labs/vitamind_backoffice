@@ -7,12 +7,12 @@ import { RequirePermission } from "@/components/admin/shared/permission";
 export default function AssignmentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ focus?: string }>;
+  searchParams: Promise<{ focus?: string; assign?: string }>;
 }) {
-  const { focus } = use(searchParams);
+  const { focus, assign } = use(searchParams);
   return (
     <RequirePermission permission="assignments.view">
-      <AssignmentsView focus={focus} />
+      <AssignmentsView focus={focus} assignPatientId={assign} />
     </RequirePermission>
   );
 }

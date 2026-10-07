@@ -12,17 +12,18 @@ import { cn } from "@/lib/utils";
 
 export function BrandMark({ collapsed }: { collapsed?: boolean }) {
   return (
-    <Link href="/admin" className="flex min-w-0 items-center justify-center gap-2.5" aria-label="VitaMind Admin">
+    <Link href="/admin" className="flex min-w-0 items-center justify-center gap-2.5" aria-label="SynQ Admin">
       <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-transparent">
         <Image
           src="/logo.svg"
-          alt="VitaMind"
+          alt=""
           width={44}
           height={44}
           className="h-11 w-11 bg-transparent object-contain"
           priority
         />
       </span>
+      {!collapsed && <span className="truncate text-sm font-semibold text-sidebar-foreground">SynQ</span>}
     </Link>
   );
 }

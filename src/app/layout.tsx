@@ -8,7 +8,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "VitaMind - Mental Wellness Management",
+  title: "SynQ - Mental Wellness Management",
   description: "Comprehensive mental health management platform",
   icons: {
     icon: "/logo.svg",

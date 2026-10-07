@@ -4,7 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * VitaMind back-office design tokens.
+ * SynQ back-office design tokens.
  * Every surface, text, state and chart colour is defined here once and consumed
  * by role (bg-card, text-muted-foreground, var(--chart-1)…). Components never use raw hex.
  */
@@ -24,7 +24,7 @@
   --input: #d6dddf;
   --ring: #3d717c;
 
-  /* Brand (VitaMind teal + gold accent) */
+  /* Brand (SynQ teal + gold accent) */
   --primary: #3d717c;
   --primary-hover: #33616b;
   --primary-foreground: #ffffff;

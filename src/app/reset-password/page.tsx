@@ -3,7 +3,7 @@ import { ResetPasswordFlow } from "@/components/admin/auth/password-reset-flow";
 import { callPasswordReset } from "@/lib/auth/password-reset.server";
 
 export const metadata: Metadata = {
-  title: "Reset password · VitaMind Admin",
+  title: "Reset password · SynQ Admin",
   robots: { index: false, follow: false },
   // The link carries a one-time secret: it must never leave in a Referer header.
   referrer: "no-referrer",

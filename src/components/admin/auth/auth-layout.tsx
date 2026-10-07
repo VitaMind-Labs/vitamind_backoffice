@@ -1,7 +1,6 @@
 import { Activity, Check, Lock, ScrollText, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Logo3D } from "./logo-3d";
 
 export function AuthLogo({ inverted, withWordmark }: { inverted?: boolean; withWordmark?: boolean }) {
   return (
@@ -9,7 +8,7 @@ export function AuthLogo({ inverted, withWordmark }: { inverted?: boolean; withW
       <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-transparent">
         <Image
           src="/logo.svg"
-          alt="VitaMind"
+          alt="SynQ"
           width={44}
           height={44}
           className="h-11 w-11 bg-transparent object-contain"
@@ -21,7 +20,7 @@ export function AuthLogo({ inverted, withWordmark }: { inverted?: boolean; withW
           <span
             className={`block text-[15px] font-semibold tracking-tight ${inverted ? "text-auth-panel-foreground" : "text-foreground"}`}
           >
-            VitaMind
+            SynQ
           </span>
           <span className={`block text-[11px] font-medium ${inverted ? "text-auth-panel-muted" : "text-muted-foreground"}`}>
             Clinical platform
@@ -54,7 +53,7 @@ export function AuthBrandPanel() {
       </div>
 
       <div className="relative flex flex-1 items-center justify-center py-6">
-        <Logo3D size={300} />
+        <Image src="/logo.svg" alt="SynQ" width={300} height={300} className="h-[300px] w-[300px] object-contain" priority />
       </div>
 
       <div className="relative max-w-md space-y-6">

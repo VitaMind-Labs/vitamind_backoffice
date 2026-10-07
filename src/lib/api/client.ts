@@ -52,7 +52,7 @@ const DEFAULT_MESSAGES: Record<number, string> = {
   409: "This action is no longer possible in the record's current state.",
   429: "Too many requests. Please wait a moment and retry.",
   501: "This operation is not implemented by the backend yet.",
-  502: "The VitaMind API is unreachable.",
+  502: "The SynQ API is unreachable.",
 };
 
 function messageFrom(payload: unknown, status: number): string {

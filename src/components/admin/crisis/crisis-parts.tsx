@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, CircleSlash, Hand, Siren, TriangleAlert, Undo2 } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, CircleSlash, Hand, Siren, TriangleAlert, Undo2, UserRoundPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Column } from "@/components/admin/shared/data-table";
@@ -180,7 +180,7 @@ export function CrisisDrawer({ crisisId, onClose }: { crisisId: string | null; o
                   <TriangleAlert className="mt-px size-3.5 shrink-0" aria-hidden />
                   <span>
                     The escalation was recorded but no clinical alert was routed
-                    {unrouted === "ANONYMOUS_SESSION" ? " because the session was anonymous." : "."}
+                    {unrouted === "ANONYMOUS_SESSION" ? " because the session was anonymous." : ". This patient has no clinician: use “Propose an assignment”."}
                   </span>
                 </div>
               )}
@@ -194,6 +194,13 @@ export function CrisisDrawer({ crisisId, onClose }: { crisisId: string | null; o
                 <Button variant="outline" size="sm" onClick={() => setDialog("escalate")} disabled={isClosed}>
                   <Undo2 /> Escalate
                 </Button>
+                {c.user && !c.clinicalAlert?.routedToId && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/assignments?assign=${c.user.id}`}>
+                      <UserRoundPlus /> Propose an assignment
+                    </Link>
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"

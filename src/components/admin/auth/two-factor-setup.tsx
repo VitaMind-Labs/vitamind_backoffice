@@ -83,7 +83,7 @@ export function TwoFactorSetup({
   const download = () => {
     if (!backupCodes?.length) return;
     const body = [
-      "VitaMind Admin — two-factor recovery codes",
+      "SynQ Admin — two-factor recovery codes",
       "Each code works once, in place of the authenticator code. Store them somewhere safe.",
       "",
       ...backupCodes,

@@ -27,9 +27,12 @@ import { ASSIGNMENT_STAGES, type PatientAssignment } from "@/types/admin";
 const REASON_MAX = 300;
 const fullName = (p: { firstName: string; lastName: string }) => `${p.firstName} ${p.lastName}`.trim() || "Unnamed clinician";
 
-function AssignDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+function AssignDialog({ open, onOpenChange, patientId }: { open: boolean; onOpenChange: (open: boolean) => void; patientId?: string }) {
   const [term, setTerm] = useState("");
-  const [patient, setPatient] = useState<{ id: string; label: string } | null>(null);
+  const [picked, setPatient] = useState<{ id: string; label: string } | null>(null);
+  // Coming from a crisis: the patient is already known, the admin only chooses the clinician.
+  const preset = useApiQuery(patientId && !picked ? ["users", "assign-preset", patientId] : null, () => usersApi.get(patientId!));
+  const patient = picked ?? (preset.data ? { id: preset.data.id, label: `${patientRef(preset.data.patientNumber)} · ${preset.data.nickname}` } : null);
   const [psychologistId, setPsychologistId] = useState("");
   const [isPrimary, setPrimary] = useState(false);
 
@@ -271,8 +274,8 @@ function AssignmentsTab({ focus }: { focus?: string }) {
   );
 }
 
-export function AssignmentsView({ focus }: { focus?: string }) {
-  const [assigning, setAssigning] = useState(false);
+export function AssignmentsView({ focus, assignPatientId }: { focus?: string; assignPatientId?: string }) {
+  const [assigning, setAssigning] = useState(!!assignPatientId);
   return (
     <div className="space-y-6">
       <PageHeader
@@ -287,7 +290,7 @@ export function AssignmentsView({ focus }: { focus?: string }) {
         }
       />
       <AssignmentsTab focus={focus} />
-      {assigning && <AssignDialog open onOpenChange={setAssigning} />}
+      {assigning && <AssignDialog open onOpenChange={setAssigning} patientId={assignPatientId} />}
     </div>
   );
 }

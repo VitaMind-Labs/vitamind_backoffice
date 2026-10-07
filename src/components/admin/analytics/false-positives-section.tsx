@@ -13,7 +13,7 @@ import { analyticsApi } from "@/lib/api/analytics";
 import { formatNumber, formatPercent, parsePercent } from "@/lib/formatters";
 import { TRIGGER_TYPES } from "@/types/admin";
 
-const TRIGGER_LABELS = { NLP: "NLP", JOURNAL: "Journal", DIAGNOSTIC: "Diagnostic", BIOMETRICS: "Biometrics", MANUAL: "Manual" };
+const TRIGGER_LABELS = { NLP: "NLP", JOURNAL: "Journal", SPARK: "Spark", DIAGNOSTIC: "Diagnostic", BIOMETRICS: "Biometrics", MANUAL: "Manual" };
 
 /** Crisis events closed as false alerts, and which detection channels produce them. */
 export function FalsePositivesSection() {

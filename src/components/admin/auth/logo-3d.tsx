@@ -5,7 +5,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const MARK_SRC = "/vitamind-mark-3d.png";
-const FALLBACK_SRC = "/logo.svg";
+const FALLBACK_SRC = "/vitamind-logo-3d.jpeg";
 const MAX_TILT = 14;
 
 /**
@@ -66,7 +66,7 @@ export function Logo3D({ size = 280, className }: { size?: number; className?: s
       style={{ width: size, height: size }}
       onPointerDown={onPointerDown}
       role="img"
-      aria-label="VitaMind logo"
+      aria-label="SynQ logo"
     >
       {/* Soft brand glow and contact shadow give the mark depth on the dark panel. */}
       <div className="pointer-events-none absolute inset-6 rounded-full bg-primary/40 blur-3xl" aria-hidden />

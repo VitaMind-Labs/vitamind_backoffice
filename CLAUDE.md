@@ -1,4 +1,4 @@
-# VitaMind Backoffice — Developer & Claude Guidelines
+# SynQ Backoffice — Developer & Claude Guidelines
 
 ## 1. Safety & Git Restrictions (CRITICAL)
 - **STRICT PROHIBITION:** Do NOT execute any Git commands (`git commit`, `git push`, `git checkout`, `git add`, etc.).

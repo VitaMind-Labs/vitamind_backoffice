@@ -163,6 +163,8 @@ export interface ModelDrift {
   byAgent: {
     mira: { sessions7d: number; crisis7d: number };
     journal: { analyses7d: number; flagged7d: number };
+    /** Counts only: Spark keeps no per-plan record to divide by, so it stays out of the crisis rate. */
+    spark?: { crisis7d: number; previousPeriodCrisis: number };
   };
 }
 

@@ -1,8 +1,8 @@
-# VitaMind Admin
+# SynQ Admin
 
-VitaMind Admin is the operational command center for the VitaMind platform. It gives administrators, operations teams, and clinical coordinators a secure workspace to monitor patient risk, manage clinical workflows, review financial activity, and maintain platform health across the product ecosystem.
+SynQ Admin is the operational command center for the SynQ platform. It gives administrators, operations teams, and clinical coordinators a secure workspace to monitor patient risk, manage clinical workflows, review financial activity, and maintain platform health across the product ecosystem.
 
-This project is built with Next.js, React, TypeScript, Tailwind CSS, and shadcn/ui, and it communicates with the VitaMind backend through a secure proxy layer designed for administrative operations.
+This project is built with Next.js, React, TypeScript, Tailwind CSS, and shadcn/ui, and it communicates with the SynQ backend through a secure proxy layer designed for administrative operations.
 
 ## Why this product exists
 
@@ -70,7 +70,7 @@ Before running this app, make sure you have:
 
 - Node.js 20+
 - npm 10+
-- A running VitaMind backend API
+- A running SynQ backend API
 
 ## Quick start
 
@@ -110,7 +110,7 @@ Create a `.env.local` file if needed:
 NEXT_PUBLIC_API_URL=http://localhost:5000
 ```
 
-If `NEXT_PUBLIC_API_URL` is not set, the app will expect the local API at the default VitaMind backend URL.
+If `NEXT_PUBLIC_API_URL` is not set, the app will expect the local API at the default SynQ backend URL.
 
 ## How it integrates with the backend
 
