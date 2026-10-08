@@ -1,165 +1,148 @@
 # SynQ Admin
 
-SynQ Admin is the operational command center for the SynQ platform. It gives administrators, operations teams, and clinical coordinators a secure workspace to monitor patient risk, manage clinical workflows, review financial activity, and maintain platform health across the product ecosystem.
+The back-office of the SynQ platform: a secure workspace where administrators, operations teams and clinical coordinators monitor risk, manage clinical workflows, oversee providers and keep the platform healthy.
 
-This project is built with Next.js, React, TypeScript, Tailwind CSS, and shadcn/ui, and it communicates with the SynQ backend through a secure proxy layer designed for administrative operations.
+![Next.js](https://img.shields.io/badge/Next.js-16-000000)
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)
+![License](https://img.shields.io/badge/license-proprietary-lightgrey)
 
-## Why this product exists
+## Table of contents
 
-The administration platform is designed for high-responsibility operational decisions. It brings together:
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Technology stack](#technology-stack)
+4. [Getting started](#getting-started)
+5. [Configuration](#configuration)
+6. [Architecture](#architecture)
+7. [Project structure](#project-structure)
+8. [Scripts](#scripts)
+9. [Security](#security)
+10. [Contributing](#contributing)
 
-- Patient and clinical oversight
-- Crisis and alert triage
-- Payment visibility
-- System health monitoring
-- Staff, clinic, and assignment management
-- Operational reporting and export workflows
+## Overview
 
-It is built to help teams move quickly while keeping permissions, auditability, and workflow clarity in place.
+SynQ Admin supports high-responsibility operational decisions. It brings patient and clinical oversight, crisis and alert triage, provider management, system health monitoring and reporting into one place, with role-based permissions and auditability built into every workflow.
 
-## Core features
+It talks to the SynQ API only; it never reaches the database or the AI engines directly.
 
-- Role-based admin dashboard and operational overview
-- Crisis and clinical alert queue management
-- User and patient record monitoring
-- Diagnostic funnel and risk visibility
-- Payment review tools
-- Notification and message routing
-- Clinic, psychologist, and assignment management
-- Coverage and staffing oversight
-- CSV export and reporting workflows
-- Secure backend proxy with API routing and access control
+## Features
+
+| Area | Capabilities |
+|---|---|
+| Dashboard | Operational summary and prioritisation |
+| Users | Patient account overview and health-risk context |
+| Diagnostics | Clinical funnel and process metrics |
+| Crisis events | Incident workflow and escalation handling |
+| Clinical alerts | Triage and routing of alerts |
+| Psychologists and clinics | Provider portfolio and licenses |
+| Assignments and coverage | Care assignments, staffing and capacity tracking |
+| Risk history, false positives, model drift | Monitoring of the AI-assisted screening |
+| System | Health of the API and of the AI engines |
+| Notifications and exports | Communication routing and CSV exports |
 
 ## Technology stack
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript 5
-- Tailwind CSS 4
-- shadcn/ui + Radix UI
-- Recharts for analytics and trend charts
-- Framer Motion for interface motion
-- Zod + React Hook Form for validation and forms
-- ESLint for quality checks
+- Next.js 16 (App Router), React 19, TypeScript 5
+- Tailwind CSS 4, shadcn/ui and Radix UI
+- Recharts for analytics, Framer Motion for motion
+- Zod and React Hook Form for validation and forms
+- ESLint
+
+## Getting started
+
+**Prerequisites:** Node.js 20+, npm 10+, and a running SynQ API.
+
+```bash
+npm install
+npm run dev -- -p 3002
+```
+
+Open `http://localhost:3002`. The port is a recommendation: the patient app uses `3000` and the psychologist app `3005` in the same local setup.
+
+Production build:
+
+```bash
+npm run build
+npm run start
+```
+
+## Configuration
+
+Create a `.env.local` file when the API is not on the default address.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:5000` | Base URL of the SynQ API, without a trailing slash |
+| `API_URL` | `NEXT_PUBLIC_API_URL` | Server-side only: lets the Next.js server reach the API over an internal URL |
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+On the API side, add this app's origin to `CORS_ORIGINS` (for example `http://localhost:3002`) and make sure the admin account exists (`npm run seed:admin` in the API project).
+
+## Architecture
+
+Sensitive administrative traffic goes through a server-side proxy so that tokens stay out of client code:
+
+```text
+Browser ──► /api/admin/... ──► SynQ API (/api/v1/admin/...) ──► data, reports, AI engine status
+Browser ──► /api/auth/...  ──► SynQ API (/auth/admin/...)    ──► login, 2FA, refresh
+```
+
+- The app uses typed API clients and route-level permission checks.
+- Authentication follows the admin model of the API: password, then TOTP 2FA, short-lived access token and an `httpOnly` refresh cookie.
+- Roles are enforced by the API on every route and mirrored in the UI to hide actions a role cannot perform.
 
 ## Project structure
 
 ```text
 vitamind_backoffice/
 ├── src/
-│   ├── app/                 # App routes, layouts, and API proxies
-│   ├── components/          # Shared UI and feature-level components
-│   ├── contexts/            # Shared app state providers
-│   ├── hooks/               # Query, mutation, and state hooks
-│   ├── lib/                 # API clients, constants, permissions, utilities
-│   ├── types/               # Shared TypeScript interfaces
-│   └── actions/             # Supporting actions (legacy or integration logic)
-├── public/                  # Static assets
-├── package.json             # Scripts and dependencies
-├── next.config.ts           # Next.js config
-├── tsconfig.json            # TypeScript config
-├── .env.local.example       # Optional local env example
-├── README.md                # Project documentation
-├── CLAUDE.md                # Local engineering notes
-└── .gitignore               # Git safety settings
+│   ├── app/            Routes, layouts and the API proxies (api/admin, api/auth)
+│   │   └── admin/      assignments, clinical-alerts, clinics, coverage, crisis-events,
+│   │                   dashboard, diagnostics, exports, false-positives, licenses,
+│   │                   model-drift, notifications, psychologists, risk-history, system, users
+│   ├── actions/        Supporting actions and integration logic
+│   ├── components/     Shared UI and feature components
+│   ├── contexts/       Application state providers
+│   ├── hooks/          Query, mutation and state hooks
+│   ├── lib/            API clients, auth, permissions, constants, formatters
+│   └── types/          Shared TypeScript interfaces
+├── public/             Static assets
+├── next.config.ts
+└── package.json
 ```
 
-## Prerequisites
+## Scripts
 
-Before running this app, make sure you have:
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Create a production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
 
-- Node.js 20+
-- npm 10+
-- A running SynQ backend API
+Run `npm run lint` and `npm run build` before opening a pull request.
 
-## Quick start
+## Security
 
-Install dependencies:
+This application handles sensitive operational and patient-related data.
 
-```bash
-npm install
-```
+- Enforce role-based access strictly; never rely on hiding a button as the only control.
+- Never expose secrets or credentials in client code, logs or screenshots.
+- Treat every API response as untrusted input.
+- Use sanitised, de-identified data in development.
+- Report security issues privately to the maintainers.
 
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Then open:
-
-- http://localhost:3000
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-Run the production build locally:
-
-```bash
-npm run start
-```
-
-## Environment variables
-
-Create a `.env.local` file if needed:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
-```
-
-If `NEXT_PUBLIC_API_URL` is not set, the app will expect the local API at the default SynQ backend URL.
-
-## How it integrates with the backend
-
-This admin platform uses a proxy architecture to keep sensitive administrative traffic behind a controlled boundary.
-
-```text
-Browser -> /api/admin/... -> Backend API -> Data/Reports/Operational services
-```
-
-The app is organized around typed API clients and route-level permission checks. Authentication and sensitive data handling follow the platform's admin access model.
-
-## Main admin areas
-
-- Dashboard: operational summary and prioritization
-- Users: patient account overview and health risk context
-- Diagnostics: clinical funnel and process metrics
-- Crisis events: incident workflow and escalation handling
-- Clinical alerts: triage and workflow routing
-- Payments: billing data and financial reporting
-- Psychologists and clinics: provider portfolio management
-- Assignments and coverage: coordination and capacity tracking
-- Notifications and exports: communication and operational reporting
-
-## Security and compliance expectations
-
-This workspace is intended for operational and administrative workflows in a professional healthcare environment. The following practices are expected:
-
-- Use role-based access controls strictly
-- Never expose secrets or credentials in client code or logs
-- Treat all API responses as untrusted data
-- Validate assumptions before acting on sensitive patient or financial information
-- Keep development data sanitized and de-identified
-
-## Quality checks
-
-Run the relevant validation before shipping changes:
-
-```bash
-npm run lint
-npm run build
-```
-
-## Contribution guidance
+## Contributing
 
 1. Work in a focused branch.
-2. Keep UI and backend integration changes scoped and readable.
-3. Validate the affected routes and flows before merge.
-4. Avoid committing environment files, generated output, or local credentials.
+2. Keep UI and API-integration changes small and readable.
+3. Verify the affected routes and flows (including loading, empty and error states).
+4. Do not commit environment files, generated output or credentials.
 
 ## License
 
-This project does not declare a public license in the repo. Treat the code as proprietary unless explicitly stated otherwise by the project owner.
+Proprietary. No public license is declared; do not reproduce or distribute the code without the owners' permission.
